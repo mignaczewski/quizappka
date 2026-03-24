@@ -31,7 +31,13 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- Contract scope identified for frontend, backend, and any shared schemas.
+- Quality gates listed explicitly: linting, formatting, type checks where
+  configured, and automated test commands for each affected layer.
+- Test strategy defined before implementation, including unit, integration,
+  contract, component, accessibility, and end-to-end coverage as applicable.
+- Cross-layer changes include a real integration validation path, not only mocks.
+- Any constitution exception is documented with rationale, owner, and expiry.
 
 ## Project Structure
 

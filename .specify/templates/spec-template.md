@@ -65,6 +65,14 @@
 
 [Add more user stories as needed, each with an assigned priority]
 
+### Test Evidence Expectations
+
+- For each user story, identify the automated tests needed to prove the behavior.
+- Distinguish frontend coverage, backend coverage, and cross-layer integration
+  coverage whenever the story crosses those boundaries.
+- If manual verification is still required, explain why automation is not
+  sufficient and what follow-up automation is expected.
+
 ### Edge Cases
 
 <!--
@@ -89,11 +97,15 @@
 - **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]
+- **FR-006**: System MUST define the contract changes, validation rules, and
+  failure behavior for every affected frontend-backend interaction.
+- **FR-007**: System MUST define the automated test coverage required to verify
+  the feature before merge.
 
 *Example of marking unclear requirements:*
 
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+- **FR-008**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
+- **FR-009**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
 ### Key Entities *(include if feature involves data)*
 
@@ -126,3 +138,5 @@
 - [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
 - [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
 - [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]
+- [Assumption about test environments, e.g., "Frontend and backend CI runners can
+  execute the required automated tests before merge"]
