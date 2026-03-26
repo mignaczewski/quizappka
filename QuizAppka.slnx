@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/QuizAppka.AppHost/QuizAppka.AppHost.csproj" />
+    <Project Path="src/QuizAppka/QuizAppka.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/QuizAppka.Tests/QuizAppka.Tests.csproj" />
+  </Folder>
+</Solution>
