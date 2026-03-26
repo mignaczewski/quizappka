@@ -13,9 +13,9 @@
 
 **Purpose**: Aspire version upgrade and desktop layout CSS baseline. Neither blocks the other; both are independent of user story implementation.
 
-- [ ] T001 Upgrade `Aspire.Hosting.AppHost` from `9.*` to `13.*` in `src/QuizAppka.AppHost/QuizAppka.AppHost.csproj`
-- [ ] T002 [P] Apply desktop-first layout baseline in `src/QuizAppka/ClientApp/src/index.css`: set `min-width: 960px` on `body`, remove narrow mobile constraints so content fills a desktop viewport comfortably
-- [ ] T003 [P] Remove mobile-centric legacy styles from `src/QuizAppka/ClientApp/src/App.css`: delete the unused Vite template classes (`.logo`, `.card`, `.read-the-docs` and their animations) that contribute to narrow/mobile appearance
+- [X] T001 Upgrade `Aspire.Hosting.AppHost` from `9.*` to `13.*` in `src/QuizAppka.AppHost/QuizAppka.AppHost.csproj`
+- [X] T002 [P] Apply desktop-first layout baseline in `src/QuizAppka/ClientApp/src/index.css`: set `min-width: 960px` on `body`, remove narrow mobile constraints so content fills a desktop viewport comfortably
+- [X] T003 [P] Remove mobile-centric legacy styles from `src/QuizAppka/ClientApp/src/App.css`: delete the unused Vite template classes (`.logo`, `.card`, `.read-the-docs` and their animations) that contribute to narrow/mobile appearance
 
 ---
 
@@ -25,8 +25,8 @@
 
 **⚠️ CRITICAL**: No user story page work can begin until this phase is complete.
 
-- [ ] T004 Delete `src/QuizAppka/ClientApp/src/pages/QuizPage.tsx`; remove its `import` statement and the `/quiz/:categoryId` `<Route>` entry from `src/QuizAppka/ClientApp/src/App.tsx` so the route slot is free for the new page
-- [ ] T005 [P] Delete `src/QuizAppka/ClientApp/src/components/NavigationBar.tsx` (no remaining consumers after QuizPage is removed)
+- [X] T004 Delete `src/QuizAppka/ClientApp/src/pages/QuizPage.tsx`; remove its `import` statement and the `/quiz/:categoryId` `<Route>` entry from `src/QuizAppka/ClientApp/src/App.tsx` so the route slot is free for the new page
+- [X] T005 [P] Delete `src/QuizAppka/ClientApp/src/components/NavigationBar.tsx` (no remaining consumers after QuizPage is removed)
 
 **Checkpoint**: Old navigation files gone — ready to implement new pages.
 
@@ -42,18 +42,18 @@
 
 > Write these tests before their corresponding implementation tasks. Run them to confirm they fail for the right reason before coding.
 
-- [ ] T006 [P] [US1] Write component tests for `QuestionList` verifying: all questions rendered as list entries, each entry shows question number and type badge, clicking an entry calls `onSelectQuestion` with the correct question id — create `src/QuizAppka/ClientApp/src/components/__tests__/QuestionList.test.tsx`
-- [ ] T007 [P] [US1] Write component tests for `QuestionListPage` verifying: loading state shown while fetch is in flight, all questions from the category appear in the list, no question detail is auto-opened, error state shown when fetch fails — create `src/QuizAppka/ClientApp/src/pages/__tests__/QuestionListPage.test.tsx`
+- [X] T006 [P] [US1] Write component tests for `QuestionList` verifying: all questions rendered as list entries, each entry shows question number and type badge, clicking an entry calls `onSelectQuestion` with the correct question id — create `src/QuizAppka/ClientApp/src/components/__tests__/QuestionList.test.tsx`
+- [X] T007 [P] [US1] Write component tests for `QuestionListPage` verifying: loading state shown while fetch is in flight, all questions from the category appear in the list, no question detail is auto-opened, error state shown when fetch fails — create `src/QuizAppka/ClientApp/src/pages/__tests__/QuestionListPage.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Create `QuestionList` component in `src/QuizAppka/ClientApp/src/components/QuestionList.tsx`: accepts `questions: Question[]` and `onSelectQuestion: (questionId: string) => void`; renders an MUI `List` where each `ListItemButton` shows 1-based question number, a type badge (`open` / `closed` / `image rebus`), and a truncated prompt preview
-- [ ] T009 [US1] Create `QuestionListPage` in `src/QuizAppka/ClientApp/src/pages/QuestionListPage.tsx`: reads `categoryId` from URL params via `useParams`, calls `fetchCategory(categoryId)`, manages `loading`/`error`/`category` state, renders the category name as heading and `QuestionList` with `onSelectQuestion` callback that navigates to `/quiz/${categoryId}/${questionId}`; wraps content in `Container maxWidth="lg"` for desktop layout
-- [ ] T010 [US1] Register `/quiz/:categoryId` → `QuestionListPage` in `src/QuizAppka/ClientApp/src/App.tsx`: add import for `QuestionListPage` and add the route entry
+- [X] T008 [US1] Create `QuestionList` component in `src/QuizAppka/ClientApp/src/components/QuestionList.tsx`: accepts `questions: Question[]` and `onSelectQuestion: (questionId: string) => void`; renders an MUI `List` where each `ListItemButton` shows 1-based question number, a type badge (`open` / `closed` / `image rebus`), and a truncated prompt preview
+- [X] T009 [US1] Create `QuestionListPage` in `src/QuizAppka/ClientApp/src/pages/QuestionListPage.tsx`: reads `categoryId` from URL params via `useParams`, calls `fetchCategory(categoryId)`, manages `loading`/`error`/`category` state, renders the category name as heading and `QuestionList` with `onSelectQuestion` callback that navigates to `/quiz/${categoryId}/${questionId}`; wraps content in `Container maxWidth="lg"` for desktop layout
+- [X] T010 [US1] Register `/quiz/:categoryId` → `QuestionListPage` in `src/QuizAppka/ClientApp/src/App.tsx`: add import for `QuestionListPage` and add the route entry
 
 ### E2E Validation for User Story 1
 
-- [ ] T011 [US1] Update `tests/QuizAppka.E2E/tests/category-selection.spec.ts`: replace the assertion "first question displayed" with assertion that the question list is displayed (e.g., multiple list items visible, no question detail heading present) after category selection
+- [X] T011 [US1] Update `tests/QuizAppka.E2E/tests/category-selection.spec.ts`: replace the assertion "first question displayed" with assertion that the question list is displayed (e.g., multiple list items visible, no question detail heading present) after category selection
 
 **Checkpoint**: US1 independently complete and testable — presenter sees a question list after category selection.
 
@@ -67,12 +67,12 @@
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T012 [P] [US2] Write component tests for `QuestionDetailPage` covering all three question types in `src/QuizAppka/ClientApp/src/pages/__tests__/QuestionDetailPage.test.tsx`: open question shows prompt only (no options); closed question shows prompt and all answer options; image rebus question shows the image and prompt; loading state shown while fetch is in flight; error state shown when question id is not found in category
+- [X] T012 [P] [US2] Write component tests for `QuestionDetailPage` covering all three question types in `src/QuizAppka/ClientApp/src/pages/__tests__/QuestionDetailPage.test.tsx`: open question shows prompt only (no options); closed question shows prompt and all answer options; image rebus question shows the image and prompt; loading state shown while fetch is in flight; error state shown when question id is not found in category
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] Create `QuestionDetailPage` in `src/QuizAppka/ClientApp/src/pages/QuestionDetailPage.tsx`: reads `categoryId` and `questionId` from URL params via `useParams`, calls `fetchCategory(categoryId)`, resolves `question` by `.find(q => q.id === questionId)`, manages `loading`/`error`/`category`/`question` state, renders `QuestionDisplay` for the resolved question with category name as heading; wraps content in `Container maxWidth="lg"` for desktop layout; shows error `Alert` if question is not found
-- [ ] T014 [US2] Register `/quiz/:categoryId/:questionId` → `QuestionDetailPage` in `src/QuizAppka/ClientApp/src/App.tsx`: add import for `QuestionDetailPage` and add the route entry (must appear before or be ordered correctly alongside the list route)
+- [X] T013 [US2] Create `QuestionDetailPage` in `src/QuizAppka/ClientApp/src/pages/QuestionDetailPage.tsx`: reads `categoryId` and `questionId` from URL params via `useParams`, calls `fetchCategory(categoryId)`, resolves `question` by `.find(q => q.id === questionId)`, manages `loading`/`error`/`category`/`question` state, renders `QuestionDisplay` for the resolved question with category name as heading; wraps content in `Container maxWidth="lg"` for desktop layout; shows error `Alert` if question is not found
+- [X] T014 [US2] Register `/quiz/:categoryId/:questionId` → `QuestionDetailPage` in `src/QuizAppka/ClientApp/src/App.tsx`: add import for `QuestionDetailPage` and add the route entry (must appear before or be ordered correctly alongside the list route)
 
 **Checkpoint**: US1 + US2 independently complete — presenter can see the list and open any question.
 
@@ -86,15 +86,15 @@
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T015 [P] [US3] Add component test in `src/QuizAppka/ClientApp/src/pages/__tests__/QuestionDetailPage.test.tsx`: verify a back button is present; verify clicking it triggers navigation to `/quiz/:categoryId` (the list route)
+- [X] T015 [P] [US3] Add component test in `src/QuizAppka/ClientApp/src/pages/__tests__/QuestionDetailPage.test.tsx`: verify a back button is present; verify clicking it triggers navigation to `/quiz/:categoryId` (the list route)
 
 ### Implementation for User Story 3
 
-- [ ] T016 [US3] Add back action to `QuestionDetailPage` in `src/QuizAppka/ClientApp/src/pages/QuestionDetailPage.tsx`: add an MUI `Button` labelled "Back to questions" (or equivalent) above the question content that calls `navigate('/quiz/${categoryId}')` when clicked
+- [X] T016 [US3] Add back action to `QuestionDetailPage` in `src/QuizAppka/ClientApp/src/pages/QuestionDetailPage.tsx`: add an MUI `Button` labelled "Back to questions" (or equivalent) above the question content that calls `navigate('/quiz/${categoryId}')` when clicked
 
 ### E2E Validation for User Story 3
 
-- [ ] T017 [US3] Rewrite `tests/QuizAppka.E2E/tests/navigation.spec.ts` to cover the new list-based flow: home → select category → expect question list → select a question → expect question detail → click back → expect question list again → select a different question → expect new question detail; remove the old previous/next/end-of-category assertions
+- [X] T017 [US3] Rewrite `tests/QuizAppka.E2E/tests/navigation.spec.ts` to cover the new list-based flow: home → select category → expect question list → select a question → expect question detail → click back → expect question list again → select a different question → expect new question detail; remove the old previous/next/end-of-category assertions
 
 **Checkpoint**: All three user stories complete — full presenter flow functional.
 
@@ -104,10 +104,10 @@
 
 **Purpose**: Validation that all layers build cleanly, existing tests pass, and the feature is merge-ready.
 
-- [ ] T018 [P] Run `npm run build` in `src/QuizAppka/ClientApp` — TypeScript compilation and Vite build must succeed with zero errors; fix any type errors surfaced
-- [ ] T019 [P] Run `dotnet build` in `src/QuizAppka.AppHost` after the Aspire 13 upgrade — build must succeed; restore packages if needed with `dotnet restore`
-- [ ] T020 [P] Run `dotnet test` in `tests/QuizAppka.Tests` — all existing backend unit tests must pass with no regressions
-- [ ] T021 Run `npm run test` in `src/QuizAppka/ClientApp` — all frontend component tests (existing + new) must pass; address any failures before marking complete
+- [X] T018 [P] Run `npm run build` in `src/QuizAppka/ClientApp` — TypeScript compilation and Vite build must succeed with zero errors; fix any type errors surfaced
+- [X] T019 [P] Run `dotnet build` in `src/QuizAppka.AppHost` after the Aspire 13 upgrade — build must succeed; restore packages if needed with `dotnet restore`
+- [X] T020 [P] Run `dotnet test` in `tests/QuizAppka.Tests` — all existing backend unit tests must pass with no regressions
+- [X] T021 Run `npm run test` in `src/QuizAppka/ClientApp` — all frontend component tests (existing + new) must pass; address any failures before marking complete
 
 ---
 
