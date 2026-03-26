@@ -11,15 +11,10 @@
 | Tool | Required Version | Check |
 |------|-----------------|-------|
 | .NET SDK | 10.0+ | `dotnet --version` |
-| .NET Aspire workload | Latest | `dotnet workload list` |
 | Node.js | 20+ LTS | `node --version` |
 | npm | 10+ | `npm --version` |
 
-### Install Aspire workload (first time)
-
-```sh
-dotnet workload install aspire
-```
+> **Note**: .NET Aspire is included as a NuGet package (`Aspire.Hosting.AppHost`) — no workload installation required.
 
 ---
 
@@ -140,6 +135,8 @@ npm run build        # outputs to ../wwwroot (configured in vite.config.ts)
 # Then publish backend
 cd ../../..
 dotnet publish src/QuizAppka/QuizAppka.csproj -c Release -o ./publish
+```
+
 The `publish/` directory contains a self-contained deployment. Run with:
 
 ```sh

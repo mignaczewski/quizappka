@@ -1,0 +1,27 @@
+{
+  "id": "sample-category",
+  "name": "Sample Category",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "open",
+      "prompt": "What is the capital of France?"
+    },
+    {
+      "id": "q2",
+      "type": "closed",
+      "prompt": "Which planet is closest to the Sun?",
+      "options": [
+        { "id": "a", "text": "Venus" },
+        { "id": "b", "text": "Mercury" },
+        { "id": "c", "text": "Earth" }
+      ]
+    },
+    {
+      "id": "q3",
+      "type": "image-rebus",
+      "prompt": "What animal is shown?",
+      "imageRef": "rebus/placeholder.png"
+    }
+  ]
+}
