@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Alert, CircularProgress, Container, Typography } from '@mui/material';
 import { fetchCategory } from '../services/quizApi';
+import { usePresenterSession } from '../hooks/usePresenterSession';
 import type { CategoryDetail } from '../types/quiz';
 import QuestionList from '../components/QuestionList';
 
 export default function QuestionListPage() {
   const { categoryId } = useParams<{ categoryId: string }>();
+  usePresenterSession({ screen: 'question-list', categoryId: categoryId ?? '' });
   const navigate = useNavigate();
   const [category, setCategory] = useState<CategoryDetail | null>(null);
   const [loading, setLoading] = useState(true);

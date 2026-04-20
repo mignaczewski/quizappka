@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/QuizAppka.AppHost/QuizAppka.AppHost.csproj" />
+    <Project Path="src/QuizAppka.AspireHost/QuizAppka.AspireHost.AppHost/QuizAppka.AspireHost.AppHost.csproj" Id="74231165-bae1-4191-a58d-6d43e20a5ee4" />
+    <Project Path="src/QuizAppka.AspireHost/QuizAppka.AspireHost.ServiceDefaults/QuizAppka.AspireHost.ServiceDefaults.csproj" />
     <Project Path="src/QuizAppka/QuizAppka.csproj" />
   </Folder>
   <Folder Name="/tests/">

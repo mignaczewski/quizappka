@@ -5,6 +5,7 @@ import HomePage from '../HomePage';
 import * as quizApi from '../../services/quizApi';
 
 vi.mock('../../services/quizApi');
+vi.mock('../../hooks/usePresenterSession');
 
 const mockFetchCategories = vi.mocked(quizApi.fetchCategories);
 

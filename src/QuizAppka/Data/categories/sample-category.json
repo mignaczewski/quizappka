@@ -21,7 +21,7 @@
       "id": "q3",
       "type": "image-rebus",
       "prompt": "What animal is shown?",
-      "imageRef": "rebus/placeholder.png"
+      "imageRef": "kowal.jpg"
     }
   ]
 }
