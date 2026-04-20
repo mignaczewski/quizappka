@@ -13,7 +13,8 @@ import { fetchCategories, fetchCategory } from '../services/quizApi';
 import { getPresenterHubConnection, startPresenterHub } from '../services/presenterHub';
 import QuestionList from '../components/QuestionList';
 import QuestionDisplay from '../components/QuestionDisplay';
-import type { CategorySummary, CategoryDetail, Question } from '../types/quiz';
+import type { CategorySummary, CategoryDetail, Question, RevealState } from '../types/quiz';
+import type { StateUpdatedPayload } from '../types/mirror';
 
 type MirrorScreen =
   | { screen: 'idle' }
@@ -21,17 +22,12 @@ type MirrorScreen =
   | { screen: 'question-list'; categoryId: string }
   | { screen: 'question-detail'; categoryId: string; questionId: string };
 
-interface StateUpdatedPayload {
-  screen: string;
-  categoryId?: string | null;
-  questionId?: string | null;
-}
-
 export default function MirrorPage() {
   const [mirrorScreen, setMirrorScreen] = useState<MirrorScreen>({ screen: 'idle' });
   const [categories, setCategories] = useState<CategorySummary[]>([]);
   const [category, setCategory] = useState<CategoryDetail | null>(null);
   const [question, setQuestion] = useState<Question | null>(null);
+  const [revealState, setRevealState] = useState<RevealState | null>(null);
   const [connected, setConnected] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);
 
@@ -40,6 +36,7 @@ export default function MirrorPage() {
 
     connection.on('StateUpdated', (payload: StateUpdatedPayload) => {
       const screen = payload.screen;
+      setRevealState(payload.revealState ?? null);
       if (screen === 'idle') {
         setMirrorScreen({ screen: 'idle' });
       } else if (screen === 'category-list') {
@@ -176,7 +173,7 @@ export default function MirrorPage() {
         <Typography variant="h4" gutterBottom>
           {category.name}
         </Typography>
-        {question && <QuestionDisplay question={question} />}
+        {question && <QuestionDisplay question={question} revealState={revealState} />}
       </Container>
     );
   }

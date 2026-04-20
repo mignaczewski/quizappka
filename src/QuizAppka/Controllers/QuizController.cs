@@ -37,8 +37,31 @@ public class QuizController : ControllerBase
             });
         }
 
+        var publicQuestions = category.Questions.Select(StripPresenterData).ToList();
+        return Ok(new CategoryDetail(category.Id, category.Name, publicQuestions));
+    }
+
+    [HttpGet("presenter/categories/{id}")]
+    public ActionResult<CategoryDetail> GetPresenterCategory(string id)
+    {
+        var category = _quizDataService.GetCategory(id);
+        if (category is null)
+        {
+            return NotFound(new ProblemDetails
+            {
+                Title = "Category not found",
+                Detail = $"No category with id '{id}' was found.",
+                Status = StatusCodes.Status404NotFound,
+            });
+        }
+
         return Ok(new CategoryDetail(category.Id, category.Name, category.Questions));
     }
+
+    private static Question StripPresenterData(Question question) =>
+        question is ClosedQuestion closed && closed.PresenterHint is not null
+            ? new ClosedQuestion { Id = closed.Id, Prompt = closed.Prompt, Options = closed.Options, PresenterHint = null }
+            : question;
 }
 
 public record CategorySummary(string Id, string Name);

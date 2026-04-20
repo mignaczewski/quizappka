@@ -16,6 +16,7 @@ export interface OpenQuestion extends BaseQuestion {
 export interface ClosedQuestion extends BaseQuestion {
   type: 'closed';
   options: AnswerOption[];
+  presenterHint?: string;
 }
 
 export interface ImageRebusQuestion extends BaseQuestion {
@@ -23,7 +24,29 @@ export interface ImageRebusQuestion extends BaseQuestion {
   imageRef: string;
 }
 
-export type Question = OpenQuestion | ClosedQuestion | ImageRebusQuestion;
+export interface MemeQuestion extends BaseQuestion {
+  type: 'meme';
+  entryImage: string;
+  revealImage?: string;
+  options: AnswerOption[];
+}
+
+export interface PianoBox {
+  id: string;
+  hiddenText: string;
+}
+
+export interface SingingPianosQuestion extends BaseQuestion {
+  type: 'singing-pianos';
+  boxes: PianoBox[];
+}
+
+export interface RevealState {
+  memeImageRevealed?: boolean | null;
+  singingPianosBoxesRevealed?: boolean[] | null;
+}
+
+export type Question = OpenQuestion | ClosedQuestion | ImageRebusQuestion | MemeQuestion | SingingPianosQuestion;
 
 export interface CategorySummary {
   id: string;

@@ -32,4 +32,30 @@ describe('ClosedQuestion', () => {
     render(<ClosedQuestion question={question} />);
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
+
+  it('does not render hint section when presenterHint is absent', () => {
+    render(<ClosedQuestion question={question} />);
+    expect(screen.queryByTestId('presenter-hint')).not.toBeInTheDocument();
+  });
+
+  it('renders plain text presenterHint when provided', () => {
+    const withHint: ClosedQuestionType = { ...question, presenterHint: 'Mercury is the answer.' };
+    render(<ClosedQuestion question={withHint} />);
+    expect(screen.getByTestId('presenter-hint')).toBeInTheDocument();
+    expect(screen.getByText('Mercury is the answer.')).toBeInTheDocument();
+  });
+
+  it('renders presenterHint as a link when it starts with https://', () => {
+    const withHint: ClosedQuestionType = { ...question, presenterHint: 'https://example.com/hint' };
+    render(<ClosedQuestion question={withHint} />);
+    const link = screen.getByRole('link');
+    expect(link).toHaveAttribute('href', 'https://example.com/hint');
+  });
+
+  it('renders presenterHint as a link when it starts with http://', () => {
+    const withHint: ClosedQuestionType = { ...question, presenterHint: 'http://example.com/hint' };
+    render(<ClosedQuestion question={withHint} />);
+    const link = screen.getByRole('link');
+    expect(link).toHaveAttribute('href', 'http://example.com/hint');
+  });
 });

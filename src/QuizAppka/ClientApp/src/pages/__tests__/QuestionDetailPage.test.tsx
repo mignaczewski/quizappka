@@ -45,20 +45,20 @@ describe('QuestionDetailPage', () => {
   });
 
   it('shows loading indicator while fetching', () => {
-    vi.mocked(quizApi.fetchCategory).mockReturnValue(new Promise(() => {}));
+    vi.mocked(quizApi.fetchPresenterCategory).mockReturnValue(new Promise(() => {}));
     renderPage();
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('renders open question — shows prompt only, no answer options', async () => {
-    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
     renderPage('science', 'q1');
     await waitFor(() => expect(screen.getByText('What is gravity?')).toBeInTheDocument());
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
   });
 
   it('renders closed question — shows prompt and all answer options', async () => {
-    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
     renderPage('science', 'q2');
     await waitFor(() => expect(screen.getByText('Atomic number of Carbon?')).toBeInTheDocument());
     expect(screen.getByText('Option Six')).toBeInTheDocument();
@@ -66,35 +66,35 @@ describe('QuestionDetailPage', () => {
   });
 
   it('renders image rebus question — shows image and prompt', async () => {
-    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
     renderPage('science', 'q3');
     await waitFor(() => expect(screen.getByRole('img')).toBeInTheDocument());
     expect(screen.getByText('Name this element')).toBeInTheDocument();
   });
 
   it('shows error alert when fetch fails', async () => {
-    vi.mocked(quizApi.fetchCategory).mockRejectedValue(new Error('Network error'));
+    vi.mocked(quizApi.fetchPresenterCategory).mockRejectedValue(new Error('Network error'));
     renderPage();
     await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
     expect(screen.getByText(/Network error/)).toBeInTheDocument();
   });
 
   it('shows error alert when question id is not found in category', async () => {
-    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
     renderPage('science', 'nonexistent');
     await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
     expect(screen.getByText(/not found/i)).toBeInTheDocument();
   });
 
   it('shows the category name as heading', async () => {
-    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
     renderPage();
     await waitFor(() => expect(screen.getByText('Science')).toBeInTheDocument());
   });
 
   // US3 tests — back to questions button
   it('renders a back to questions button', async () => {
-    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
     renderPage('science', 'q1');
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Back to questions' })).toBeInTheDocument()
@@ -102,7 +102,7 @@ describe('QuestionDetailPage', () => {
   });
 
   it('navigates to the question list when back to questions button is clicked', async () => {
-    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
     renderPage('science', 'q1');
     await waitFor(() => screen.getByRole('button', { name: 'Back to questions' }));
     await userEvent.click(screen.getByRole('button', { name: 'Back to questions' }));
@@ -111,7 +111,7 @@ describe('QuestionDetailPage', () => {
 
   // T004 — back to categories button is present
   it('renders a back to categories button', async () => {
-    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
     renderPage('science', 'q1');
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Back to categories' })).toBeInTheDocument()
@@ -120,7 +120,7 @@ describe('QuestionDetailPage', () => {
 
   // T005 — back to categories button navigates to /
   it('navigates to category list when back to categories button is clicked', async () => {
-    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
     renderPage('science', 'q1');
     await waitFor(() => screen.getByRole('button', { name: 'Back to categories' }));
     await userEvent.click(screen.getByRole('button', { name: 'Back to categories' }));
@@ -129,7 +129,7 @@ describe('QuestionDetailPage', () => {
 
   // T006 — both back buttons are present simultaneously
   it('renders both back to categories and back to questions buttons together', async () => {
-    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
     renderPage('science', 'q1');
     await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Back to categories' })).toBeInTheDocument();
@@ -137,3 +137,4 @@ describe('QuestionDetailPage', () => {
     });
   });
 });
+
