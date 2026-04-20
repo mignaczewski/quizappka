@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import QuestionListPage from '../QuestionListPage';
 import * as quizApi from '../../services/quizApi';
@@ -27,6 +28,7 @@ function renderPage(categoryId = 'science') {
   return render(
     <MemoryRouter initialEntries={[`/quiz/${categoryId}`]}>
       <Routes>
+        <Route path="/" element={<div data-testid="category-list">Category List</div>} />
         <Route path="/quiz/:categoryId" element={<QuestionListPage />} />
         <Route path="/quiz/:categoryId/:questionId" element={<div>Question Detail</div>} />
       </Routes>
@@ -48,7 +50,8 @@ describe('QuestionListPage', () => {
   it('renders all questions from the category as list entries', async () => {
     vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
     renderPage();
-    await waitFor(() => expect(screen.getAllByRole('button')).toHaveLength(3));
+    // 3 question buttons + 1 "Back to categories" button = 4 total
+    await waitFor(() => expect(screen.getAllByRole('button')).toHaveLength(4));
     expect(screen.getByText(/What is gravity/)).toBeInTheDocument();
     expect(screen.getByText(/Atomic number of Carbon/)).toBeInTheDocument();
     expect(screen.getByText(/Name the element/)).toBeInTheDocument();
@@ -88,5 +91,23 @@ describe('QuestionListPage', () => {
       expect(screen.getByText('closed')).toBeInTheDocument();
       expect(screen.getByText('image rebus')).toBeInTheDocument();
     });
+  });
+
+  // T001 — back to categories button is present
+  it('renders a back to categories button', async () => {
+    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Back to categories' })).toBeInTheDocument()
+    );
+  });
+
+  // T002 — back to categories button navigates to /
+  it('navigates to category list when back to categories button is clicked', async () => {
+    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    renderPage();
+    await waitFor(() => screen.getByRole('button', { name: 'Back to categories' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Back to categories' }));
+    expect(screen.getByTestId('category-list')).toBeInTheDocument();
   });
 });

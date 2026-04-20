@@ -31,6 +31,7 @@ function renderPage(categoryId = 'science', questionId = 'q1') {
   return render(
     <MemoryRouter initialEntries={[`/quiz/${categoryId}/${questionId}`]}>
       <Routes>
+        <Route path="/" element={<div data-testid="category-list">Category List</div>} />
         <Route path="/quiz/:categoryId" element={<div data-testid="question-list">Question List</div>} />
         <Route path="/quiz/:categoryId/:questionId" element={<QuestionDetailPage />} />
       </Routes>
@@ -91,18 +92,48 @@ describe('QuestionDetailPage', () => {
     await waitFor(() => expect(screen.getByText('Science')).toBeInTheDocument());
   });
 
-  // US3 tests — back button (added here as the component grows to include it)
-  it('renders a back button', async () => {
+  // US3 tests — back to questions button
+  it('renders a back to questions button', async () => {
     vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
     renderPage('science', 'q1');
-    await waitFor(() => expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Back to questions' })).toBeInTheDocument()
+    );
   });
 
-  it('navigates to the question list when back button is clicked', async () => {
+  it('navigates to the question list when back to questions button is clicked', async () => {
     vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
     renderPage('science', 'q1');
-    await waitFor(() => screen.getByRole('button', { name: /back/i }));
-    await userEvent.click(screen.getByRole('button', { name: /back/i }));
+    await waitFor(() => screen.getByRole('button', { name: 'Back to questions' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Back to questions' }));
     expect(screen.getByTestId('question-list')).toBeInTheDocument();
+  });
+
+  // T004 — back to categories button is present
+  it('renders a back to categories button', async () => {
+    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    renderPage('science', 'q1');
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Back to categories' })).toBeInTheDocument()
+    );
+  });
+
+  // T005 — back to categories button navigates to /
+  it('navigates to category list when back to categories button is clicked', async () => {
+    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    renderPage('science', 'q1');
+    await waitFor(() => screen.getByRole('button', { name: 'Back to categories' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Back to categories' }));
+    expect(screen.getByTestId('category-list')).toBeInTheDocument();
+  });
+
+  // T006 — both back buttons are present simultaneously
+  it('renders both back to categories and back to questions buttons together', async () => {
+    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    renderPage('science', 'q1');
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Back to categories' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Back to questions' })).toBeInTheDocument();
+    });
   });
 });
