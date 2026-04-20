@@ -13,8 +13,8 @@
 
 **Purpose**: Add the two new dependencies required by the feature. Both are independent and can run in parallel.
 
-- [ ] T001 Install `@microsoft/signalr` npm package in `src/QuizAppka/ClientApp` by running `npm install @microsoft/signalr` and verifying the dependency appears in `src/QuizAppka/ClientApp/package.json`
-- [ ] T002 [P] Add `Microsoft.AspNetCore.SignalR.Client` NuGet package to `tests/QuizAppka.Tests/QuizAppka.Tests.csproj` by running `dotnet add tests/QuizAppka.Tests/QuizAppka.Tests.csproj package Microsoft.AspNetCore.SignalR.Client`
+- [X] T001 Install `@microsoft/signalr` npm package
+- [X] T002 [P] Add `Microsoft.AspNetCore.SignalR.Client` NuGet package to `tests/QuizAppka.Tests/QuizAppka.Tests.csproj`
 
 ---
 
@@ -24,12 +24,12 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T003 Create `PresenterStateDto` C# record in `src/QuizAppka/Models/PresenterStateDto.cs`: `public record PresenterStateDto(string Screen, string? CategoryId = null, string? QuestionId = null)` — serialized as camelCase JSON by SignalR's default `System.Text.Json` serializer
-- [ ] T004 [P] Create `IPresenterSessionStore` interface in `src/QuizAppka/Services/IPresenterSessionStore.cs`: expose `PresenterStateDto? CurrentState { get; }` (read) and `void SetState(PresenterStateDto state)` (write) — the store is the single authoritative reference for the current presenter screen
-- [ ] T005 [P] Create `PresenterSessionStore` implementation in `src/QuizAppka/Services/PresenterSessionStore.cs`: implements `IPresenterSessionStore`; holds a `PresenterStateDto? _current` field; protects concurrent access with a `Lock` object (use `lock` statement); `SetState` overwrites the stored value; `CurrentState` returns it
-- [ ] T006 [P] Create `PresenterScreen` TypeScript discriminated union type in `src/QuizAppka/ClientApp/src/types/mirror.ts`: export `PresenterScreen` as a union of `{ screen: 'idle' }`, `{ screen: 'category-list' }`, `{ screen: 'question-list'; categoryId: string }`, and `{ screen: 'question-detail'; categoryId: string; questionId: string }`
-- [ ] T007 Create `PresenterHub` SignalR hub class in `src/QuizAppka/Hubs/PresenterHub.cs`: inject `IPresenterSessionStore`; implement `OnConnectedAsync` — if store has a current state, call `Clients.Caller.SendAsync("StateUpdated", current)` before `base.OnConnectedAsync()`; implement `UpdateState(PresenterStateDto state)` — validate that `state.Screen` is one of the four known values (drop silently if not), call `_store.SetState(state)`, then `Clients.All.SendAsync("StateUpdated", state)`
-- [ ] T008 Register SignalR in `src/QuizAppka/Program.cs`: add `builder.Services.AddSignalR()` before `builder.Build()`; add `builder.Services.AddSingleton<IPresenterSessionStore, PresenterSessionStore>()`; after `app.Build()` add `app.MapHub<PresenterHub>("/hubs/presenter")` before `app.MapFallbackToFile("index.html")`
+- [X] T003 Create `PresenterStateDto` C# record in `src/QuizAppka/Models/PresenterStateDto.cs`
+- [X] T004 [P] Create `IPresenterSessionStore` interface in `src/QuizAppka/Services/IPresenterSessionStore.cs`
+- [X] T005 [P] Create `PresenterSessionStore` implementation in `src/QuizAppka/Services/PresenterSessionStore.cs`
+- [X] T006 [P] Create `PresenterScreen` TypeScript discriminated union type in `src/QuizAppka/ClientApp/src/types/mirror.ts`
+- [X] T007 Create `PresenterHub` SignalR hub class in `src/QuizAppka/Hubs/PresenterHub.cs`
+- [X] T008 Register SignalR in `src/QuizAppka/Program.cs`
 
 **Checkpoint**: Backend hub is live — `ws://localhost:{port}/hubs/presenter` accepts WebSocket connections.
 
@@ -45,16 +45,16 @@
 
 > Write these tests before their corresponding implementation tasks. Confirm they fail for the right reason before coding.
 
-- [ ] T009 [P] [US1] Create `tests/QuizAppka.Tests/Services/PresenterSessionStoreTests.cs`: verify `CurrentState` is `null` on construction; verify `SetState` stores and `CurrentState` returns the stored value; verify a second `SetState` call overwrites the first; verify concurrent reads do not throw (run multiple reads alongside a write using `Task.WhenAll`)
-- [ ] T010 [P] [US1] Create `tests/QuizAppka.Tests/Hubs/PresenterHubTests.cs` as hub integration tests using `WebApplicationFactory<Program>` with `HubConnectionBuilder` using `HttpTransportType.WebSockets` and `factory.Server.CreateHandler()` as `HttpMessageHandlerFactory`: (a) connect a mirror client when store is empty — verify no `StateUpdated` event is received; (b) set a state in the store, then connect a mirror client — verify the mirror immediately receives `StateUpdated` with that state (late-join); (c) connect a client, then a presenter calls `UpdateState` — verify the connected client receives `StateUpdated`; (d) call `UpdateState` with an unknown `screen` value — verify no `StateUpdated` is fired and store remains unchanged
-- [ ] T011 [P] [US1] Create `src/QuizAppka/ClientApp/src/pages/__tests__/MirrorPage.test.tsx`: mock the `presenterHub` module so tests control the `StateUpdated` callback; verify idle/waiting UI renders when no state has been received; verify category list renders (without navigation controls) when state is `{ screen: 'category-list' }`; verify question list renders (without navigation controls) when state is `{ screen: 'question-list', categoryId: 'cat1' }`; verify question detail renders (without back/navigation buttons) when state is `{ screen: 'question-detail', categoryId: 'cat1', questionId: 'q1' }`; verify a disconnected banner appears when connection state is `Reconnecting`
+- [X] T009 [P] [US1] Create `tests/QuizAppka.Tests/Services/PresenterSessionStoreTests.cs`
+- [X] T010 [P] [US1] Create `tests/QuizAppka.Tests/Hubs/PresenterHubTests.cs`
+- [X] T011 [P] [US1] Create `src/QuizAppka/ClientApp/src/pages/__tests__/MirrorPage.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create `src/QuizAppka/ClientApp/src/services/presenterHub.ts`: export `getPresenterHubConnection()` as a module-level singleton factory; build the connection using `new HubConnectionBuilder().withUrl('/hubs/presenter', { transport: HttpTransportType.WebSockets }).withAutomaticReconnect().configureLogging(LogLevel.Warning).build()`; export the connection instance as the singleton (initialize lazily on first call)
-- [ ] T013 [US1] Create `src/QuizAppka/ClientApp/src/pages/MirrorPage.tsx`: call `getPresenterHubConnection()` on mount; subscribe to `StateUpdated` before calling `connection.start()`; subscribe to `onreconnecting` to set a `disconnected` state flag (show a non-intrusive overlay/banner); subscribe to `onreconnected` to clear the flag; store received `PresenterScreen` state; render based on `screen` discriminant — `idle`: show a centered "Waiting for presenter…" message with a `CircularProgress`; `category-list`: render `CategoryList` component with fetched categories (call `fetchCategories()`) but without any clickable navigation; `question-list`: render `QuestionList` component with fetched category questions but without `onSelectQuestion` interaction; `question-detail`: render `QuestionDisplay` component for the resolved question without the back button; stop the connection on unmount
-- [ ] T014 [US1] Register `/mirror` route in `src/QuizAppka/ClientApp/src/App.tsx`: import `MirrorPage` and add `<Route path="/mirror" element={<MirrorPage />} />` inside the existing `<Routes>`
-- [ ] T015 [P] [US1] Add an "Open Mirror" button to `src/QuizAppka/ClientApp/src/pages/HomePage.tsx`: add an MUI `Button` (or `IconButton` with tooltip) above the category list, labelled "Open Mirror", with `component="a"`, `href="/mirror"`, and `target="_blank"` so it opens the mirror in a new tab without navigating the presenter away — satisfies SC-001 (single action to open mirror)
+- [X] T012 [P] [US1] Create `src/QuizAppka/ClientApp/src/services/presenterHub.ts`
+- [X] T013 [US1] Create `src/QuizAppka/ClientApp/src/pages/MirrorPage.tsx`
+- [X] T014 [US1] Register `/mirror` route in `src/QuizAppka/ClientApp/src/App.tsx`
+- [X] T015 [P] [US1] Add an "Open Mirror" button to `src/QuizAppka/ClientApp/src/pages/HomePage.tsx`
 
 **Checkpoint**: US1 independently complete and testable — T009/T010/T011 all pass; mirror route renders correct read-only screens; idle state shown when no session; mirror button visible on homepage.
 
@@ -70,15 +70,15 @@
 
 > Write these tests before their corresponding implementation tasks.
 
-- [ ] T016 [P] [US2] Create `src/QuizAppka/ClientApp/src/hooks/__tests__/usePresenterSession.test.tsx`: mock `getPresenterHubConnection()` to return a fake connection object with a controllable `start()` and `invoke()` spy; verify the hook calls `connection.start()` on first render; verify the hook invokes `UpdateState` with `{ screen: 'category-list' }` when called with that state; verify the hook invokes `UpdateState` with `{ screen: 'question-list', categoryId: 'cat1' }` when called with that state and `categoryId` changes; verify the hook stops the connection on unmount
-- [ ] T017 [US2] Create `tests/QuizAppka.E2E/tests/mirroring.spec.ts` E2E test for US2 navigation chain: open presenter at `/`; open mirror at `/mirror` in a second page; verify mirror shows category list; click a category in presenter — verify mirror shows question list for that category; click a question in presenter — verify mirror shows that question's content without back/navigation buttons; click back in presenter — verify mirror returns to question list
+- [X] T016 [P] [US2] Create `src/QuizAppka/ClientApp/src/hooks/__tests__/usePresenterSession.test.tsx`: mock `getPresenterHubConnection()` to return a fake connection object with a controllable `start()` and `invoke()` spy; verify the hook calls `connection.start()` on first render; verify the hook invokes `UpdateState` with `{ screen: 'category-list' }` when called with that state; verify the hook invokes `UpdateState` with `{ screen: 'question-list', categoryId: 'cat1' }` when called with that state and `categoryId` changes; verify the hook stops the connection on unmount
+- [X] T017 [US2] Create `tests/QuizAppka.E2E/tests/mirroring.spec.ts` E2E test for US2 navigation chain: open presenter at `/`; open mirror at `/mirror` in a second page; verify mirror shows category list; click a category in presenter — verify mirror shows question list for that category; click a question in presenter — verify mirror shows that question's content without back/navigation buttons; click back in presenter — verify mirror returns to question list
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Create `src/QuizAppka/ClientApp/src/hooks/usePresenterSession.ts`: export `function usePresenterSession(state: PresenterScreen): void`; get or create the hub connection via `getPresenterHubConnection()`; in a `useEffect` dependent on the serialized state fields, call `connection.invoke('UpdateState', state)` if the connection is in `Connected` state — if not yet connected, start the connection first then invoke; the connection lifetime is bound to the module singleton (do not start/stop on every hook call — guard with the connection state)
-- [ ] T019 [P] [US2] Modify `src/QuizAppka/ClientApp/src/pages/HomePage.tsx`: import `usePresenterSession` from `../hooks/usePresenterSession`; call `usePresenterSession({ screen: 'category-list' })` at the top of the component body (unconditionally) so the presenter hub receives the state immediately when the category list is mounted
-- [ ] T020 [P] [US2] Modify `src/QuizAppka/ClientApp/src/pages/QuestionListPage.tsx`: import `usePresenterSession`; call `usePresenterSession({ screen: 'question-list', categoryId: categoryId ?? '' })` at the top of the component body so the hub receives the state when this page mounts or `categoryId` changes
-- [ ] T021 [P] [US2] Modify `src/QuizAppka/ClientApp/src/pages/QuestionDetailPage.tsx`: import `usePresenterSession`; call `usePresenterSession({ screen: 'question-detail', categoryId: categoryId ?? '', questionId: questionId ?? '' })` at the top of the component body so the hub receives the state when this page mounts or either param changes
+- [X] T018 [US2] Create `src/QuizAppka/ClientApp/src/hooks/usePresenterSession.ts`
+- [X] T019 [P] [US2] Modify `src/QuizAppka/ClientApp/src/pages/HomePage.tsx`
+- [X] T020 [P] [US2] Modify `src/QuizAppka/ClientApp/src/pages/QuestionListPage.tsx`
+- [X] T021 [P] [US2] Modify `src/QuizAppka/ClientApp/src/pages/QuestionDetailPage.tsx`
 
 **Checkpoint**: US2 complete — mirror follows presenter navigation in real time; T016 passes; T017 E2E test passes.
 
@@ -94,8 +94,8 @@
 
 > No new implementation files are required for this story — the hub's `Clients.All` broadcast and `OnConnectedAsync` late-join delivery (both implemented in Phase 2) already satisfy the behavior. These tasks add the E2E proof.
 
-- [ ] T022 [US3] Extend `tests/QuizAppka.E2E/tests/mirroring.spec.ts` with a multiple-mirrors test: open presenter at `/`; open three mirror pages simultaneously; navigate the presenter to a specific question; verify all three mirror pages show that question; close one mirror page; navigate the presenter to a different question; verify the remaining two mirror pages update to the new question
-- [ ] T023 [US3] Extend `tests/QuizAppka.E2E/tests/mirroring.spec.ts` with a late-join test: open presenter at `/`; navigate to a question; then open a new mirror page; verify the mirror immediately shows that question without any additional presenter navigation
+- [X] T022 [US3] Extend `tests/QuizAppka.E2E/tests/mirroring.spec.ts` with a multiple-mirrors test: open presenter at `/`; open three mirror pages simultaneously; navigate the presenter to a specific question; verify all three mirror pages show that question; close one mirror page; navigate the presenter to a different question; verify the remaining two mirror pages update to the new question
+- [X] T023 [US3] Extend `tests/QuizAppka.E2E/tests/mirroring.spec.ts` with a late-join test: open presenter at `/`; navigate to a question; then open a new mirror page; verify the mirror immediately shows that question without any additional presenter navigation
 
 **Checkpoint**: All three user stories complete — full mirroring feature functional.
 
@@ -105,9 +105,9 @@
 
 **Purpose**: Confirm all quality gates pass across both layers before marking the feature merge-ready.
 
-- [ ] T024 [P] Run `dotnet test` from the repository root — all backend unit and integration tests including `PresenterSessionStoreTests` and `PresenterHubTests` must pass with no failures or skipped tests; fix any failures before continuing
-- [ ] T025 [P] Run `npm run lint && npm run type-check && npm run test` in `src/QuizAppka/ClientApp` — ESLint, TypeScript compilation, and Vitest must all report zero errors; `MirrorPage.test.tsx` and `usePresenterSession.test.tsx` must be included in the passing test run
-- [ ] T026 Run `npx playwright test` in `tests/QuizAppka.E2E` — `mirroring.spec.ts` (US2 navigation chain, US3 multiple mirrors, US3 late-join) plus all pre-existing specs must pass; fix any regressions in `category-selection.spec.ts` and `navigation.spec.ts` before declaring complete
+- [X] T024 [P] Run `dotnet test` from the repository root — all backend unit and integration tests including `PresenterSessionStoreTests` and `PresenterHubTests` must pass with no failures or skipped tests; fix any failures before continuing
+- [X] T025 [P] Run `npm run lint && npm run type-check && npm run test` in `src/QuizAppka/ClientApp` — ESLint, TypeScript compilation, and Vitest must all report zero errors; `MirrorPage.test.tsx` and `usePresenterSession.test.tsx` must be included in the passing test run
+- [X] T026 Run `npx playwright test` in `tests/QuizAppka.E2E` — `mirroring.spec.ts` (US2 navigation chain, US3 multiple mirrors, US3 late-join) plus all pre-existing specs must pass; fix any regressions in `category-selection.spec.ts` and `navigation.spec.ts` before declaring complete
 
 ---
 

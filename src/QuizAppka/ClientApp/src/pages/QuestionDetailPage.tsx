@@ -2,11 +2,17 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Alert, Button, CircularProgress, Container, Typography } from '@mui/material';
 import { fetchCategory } from '../services/quizApi';
+import { usePresenterSession } from '../hooks/usePresenterSession';
 import type { CategoryDetail, Question } from '../types/quiz';
 import QuestionDisplay from '../components/QuestionDisplay';
 
 export default function QuestionDetailPage() {
   const { categoryId, questionId } = useParams<{ categoryId: string; questionId: string }>();
+  usePresenterSession({
+    screen: 'question-detail',
+    categoryId: categoryId ?? '',
+    questionId: questionId ?? '',
+  });
   const navigate = useNavigate();
   const [category, setCategory] = useState<CategoryDetail | null>(null);
   const [question, setQuestion] = useState<Question | null>(null);

@@ -7,6 +7,7 @@ import * as quizApi from '../../services/quizApi';
 import type { CategoryDetail } from '../../types/quiz';
 
 vi.mock('../../services/quizApi');
+vi.mock('../../hooks/usePresenterSession');
 
 const mockCategory: CategoryDetail = {
   id: 'science',
