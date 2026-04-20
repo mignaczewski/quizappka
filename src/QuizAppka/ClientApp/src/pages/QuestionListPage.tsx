@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Alert, CircularProgress, Container, Typography } from '@mui/material';
+import { Alert, Button, CircularProgress, Container, Typography } from '@mui/material';
 import { fetchCategory } from '../services/quizApi';
 import { usePresenterSession } from '../hooks/usePresenterSession';
 import type { CategoryDetail } from '../types/quiz';
@@ -49,6 +49,9 @@ export default function QuestionListPage() {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Button variant="text" onClick={() => navigate('/')} sx={{ mb: 2 }} aria-label="Back to categories">
+        ← Back to categories
+      </Button>
       <Typography variant="h4" gutterBottom>{category.name}</Typography>
       <Typography variant="body1" color="text.secondary" gutterBottom>
         {category.questions.length} question{category.questions.length !== 1 ? 's' : ''}
