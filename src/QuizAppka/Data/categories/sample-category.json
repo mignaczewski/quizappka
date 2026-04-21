@@ -1,0 +1,62 @@
+{
+  "id": "sample-category",
+  "name": "Sample Category",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "open",
+      "prompt": "What is the capital of France?",
+      "presenterHint": "The answer is Paris. It's known as the City of Light."
+    },
+    {
+      "id": "q2",
+      "type": "closed",
+      "prompt": "Which planet is closest to the Sun?",
+      "options": [
+        { "id": "a", "text": "Venus" },
+        { "id": "b", "text": "Mercury" },
+        { "id": "c", "text": "Earth" }
+      ],
+      "presenterHint": "Mercury is the answer. Fun fact: Venus is hotter despite being further away."
+    },
+    {
+      "id": "q3",
+      "type": "image-rebus",
+      "prompt": "What animal is shown?",
+      "imageRef": "kowal.jpg"
+    },
+    {
+      "id": "q4",
+      "type": "meme",
+      "prompt": "Which meme best describes Monday mornings?",
+      "entryImage": "meme-question.jpg",
+      "revealImage": "kowal.jpg",
+      "options": [
+        {
+          "id": "a",
+          "text": "Crying inside"
+        },
+        {
+          "id": "b",
+          "text": "This is fine"
+        },
+        {
+          "id": "c",
+          "text": "Surprised Pikachu"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "type": "singing-pianos",
+      "prompt": "Press each box to reveal the hidden notes!",
+      "boxes": [
+        { "id": "box1", "hiddenText": "DO" },
+        { "id": "box2", "hiddenText": "RE" },
+        { "id": "box3", "hiddenText": "MI" },
+        { "id": "box4", "hiddenText": "FA" },
+        { "id": "box5", "hiddenText": "SOL" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+# .NET build outputs
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# NuGet packages
+packages/
+*.nupkg
+*.nuget.props
+*.nuget.targets
+
+# .NET Aspire
+.aspire/
+
+# Frontend
+src/QuizAppka/ClientApp/node_modules/
+src/QuizAppka/ClientApp/dist/
+src/QuizAppka/wwwroot/
+tests/QuizAppka.E2E/node_modules/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Test results
+TestResults/
+coverage/
+playwright-report/
+test-results/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/settings.json

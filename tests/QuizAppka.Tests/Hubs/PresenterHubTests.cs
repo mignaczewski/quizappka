@@ -1,0 +1,199 @@
+using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR.Client;
+using QuizAppka.Models;
+
+namespace QuizAppka.Tests.Hubs;
+
+public class PresenterHubTests : IClassFixture<WebApplicationFactory<Program>>
+{
+    private readonly WebApplicationFactory<Program> _factory;
+
+    public PresenterHubTests(WebApplicationFactory<Program> factory)
+    {
+        _factory = factory;
+    }
+
+    private HubConnection BuildConnection()
+    {
+        var server = _factory.Server;
+        return new HubConnectionBuilder()
+            .WithUrl("http://localhost/hubs/presenter", o =>
+            {
+                o.Transports = HttpTransportType.WebSockets;
+                o.SkipNegotiation = true;
+                o.WebSocketFactory = async (ctx, ct) =>
+                {
+                    var ws = server.CreateWebSocketClient();
+                    var uri = new UriBuilder(ctx.Uri) { Scheme = "ws" }.Uri;
+                    return await ws.ConnectAsync(uri, ct);
+                };
+            })
+            .Build();
+    }
+
+    [Fact]
+    public async Task UpdateState_BroadcastsToAllClients()
+    {
+        var connection1 = BuildConnection();
+        var connection2 = BuildConnection();
+
+        PresenterStateDto? received = null;
+        connection2.On<PresenterStateDto>("StateUpdated", s => received = s);
+
+        await connection1.StartAsync();
+        await connection2.StartAsync();
+
+        await connection1.InvokeAsync("UpdateState", new PresenterStateDto("category-list"));
+
+        await Task.Delay(200);
+
+        Assert.NotNull(received);
+        Assert.Equal("category-list", received.Screen);
+
+        await connection1.DisposeAsync();
+        await connection2.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task OnConnectedAsync_SendsCurrentState_ToLateJoiner()
+    {
+        var sender = BuildConnection();
+        await sender.StartAsync();
+        await sender.InvokeAsync("UpdateState", new PresenterStateDto("question-list", "cat1"));
+
+        var receiver = BuildConnection();
+        PresenterStateDto? received = null;
+        receiver.On<PresenterStateDto>("StateUpdated", s => received = s);
+        await receiver.StartAsync();
+
+        await Task.Delay(200);
+
+        Assert.NotNull(received);
+        Assert.Equal("question-list", received.Screen);
+        Assert.Equal("cat1", received.CategoryId);
+
+        await sender.DisposeAsync();
+        await receiver.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task UpdateState_ThrowsHubException_ForInvalidScreen()
+    {
+        var connection = BuildConnection();
+        await connection.StartAsync();
+
+        await Assert.ThrowsAsync<HubException>(() =>
+            connection.InvokeAsync("UpdateState", new PresenterStateDto("invalid-screen")));
+
+        await connection.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task UpdateState_WithMemeRevealState_BroadcastsToAllClients()
+    {
+        var connection1 = BuildConnection();
+        var connection2 = BuildConnection();
+
+        PresenterStateDto? received = null;
+        connection2.On<PresenterStateDto>("StateUpdated", s => received = s);
+
+        await connection1.StartAsync();
+        await connection2.StartAsync();
+
+        var state = new PresenterStateDto(
+            "question-detail", "cat1", "q4", new RevealState(MemeImageRevealed: true));
+        await connection1.InvokeAsync("UpdateState", state);
+
+        await Task.Delay(200);
+
+        Assert.NotNull(received);
+        Assert.Equal("question-detail", received.Screen);
+        Assert.NotNull(received.RevealState);
+        Assert.True(received.RevealState.MemeImageRevealed);
+
+        await connection1.DisposeAsync();
+        await connection2.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task OnConnectedAsync_SendsMemeRevealState_ToLateJoiner()
+    {
+        var sender = BuildConnection();
+        await sender.StartAsync();
+        await sender.InvokeAsync("UpdateState", new PresenterStateDto(
+            "question-detail", "cat1", "q4", new RevealState(MemeImageRevealed: true)));
+
+        var receiver = BuildConnection();
+        PresenterStateDto? received = null;
+        receiver.On<PresenterStateDto>("StateUpdated", s => received = s);
+        await receiver.StartAsync();
+
+        await Task.Delay(200);
+
+        Assert.NotNull(received);
+        Assert.NotNull(received.RevealState);
+        Assert.True(received.RevealState.MemeImageRevealed);
+
+        await sender.DisposeAsync();
+        await receiver.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task UpdateState_WithSingingPianosBoxesRevealed_BroadcastsToAllClients()
+    {
+        var connection1 = BuildConnection();
+        var connection2 = BuildConnection();
+
+        PresenterStateDto? received = null;
+        connection2.On<PresenterStateDto>("StateUpdated", s => received = s);
+
+        await connection1.StartAsync();
+        await connection2.StartAsync();
+
+        var revealState = new RevealState(SingingPianosBoxesRevealed: [true, false, false, false, false]);
+        await connection1.InvokeAsync("UpdateState",
+            new PresenterStateDto("question-detail", "cat1", "q5", revealState));
+
+        await Task.Delay(200);
+
+        Assert.NotNull(received);
+        Assert.NotNull(received.RevealState);
+        Assert.NotNull(received.RevealState.SingingPianosBoxesRevealed);
+        Assert.Equal(5, received.RevealState.SingingPianosBoxesRevealed.Length);
+        Assert.True(received.RevealState.SingingPianosBoxesRevealed[0]);
+        Assert.False(received.RevealState.SingingPianosBoxesRevealed[1]);
+
+        await connection1.DisposeAsync();
+        await connection2.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task OnConnectedAsync_SendsSingingPianosBoxRevealState_ToLateJoiner()
+    {
+        var sender = BuildConnection();
+        await sender.StartAsync();
+        var revealState = new RevealState(SingingPianosBoxesRevealed: [true, false, true, false, false]);
+        await sender.InvokeAsync("UpdateState",
+            new PresenterStateDto("question-detail", "cat1", "q5", revealState));
+
+        var receiver = BuildConnection();
+        PresenterStateDto? received = null;
+        receiver.On<PresenterStateDto>("StateUpdated", s => received = s);
+        await receiver.StartAsync();
+
+        await Task.Delay(200);
+
+        Assert.NotNull(received);
+        Assert.NotNull(received.RevealState);
+        var boxes = received.RevealState.SingingPianosBoxesRevealed;
+        Assert.NotNull(boxes);
+        Assert.True(boxes[0]);
+        Assert.False(boxes[1]);
+        Assert.True(boxes[2]);
+
+        await sender.DisposeAsync();
+        await receiver.DisposeAsync();
+    }
+}
