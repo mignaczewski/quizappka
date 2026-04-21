@@ -18,3 +18,14 @@ export async function fetchCategory(id: string): Promise<CategoryDetail> {
   }
   return response.json() as Promise<CategoryDetail>;
 }
+
+export async function fetchPresenterCategory(id: string): Promise<CategoryDetail> {
+  const response = await fetch(`/api/quiz/presenter/categories/${encodeURIComponent(id)}`);
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error(`Category not found: ${id}`);
+    }
+    throw new Error(`Failed to fetch presenter category: ${response.status}`);
+  }
+  return response.json() as Promise<CategoryDetail>;
+}

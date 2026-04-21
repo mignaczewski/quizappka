@@ -14,6 +14,12 @@ function typeLabel(question: Question): string {
       return 'closed';
     case 'image-rebus':
       return 'image rebus';
+    case 'meme':
+      return 'meme';
+    case 'singing-pianos':
+      return 'singing pianos';
+    default:
+      return 'unknown'; 
   }
 }
 

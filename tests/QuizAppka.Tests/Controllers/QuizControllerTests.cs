@@ -108,6 +108,84 @@ public class QuizControllerTests : IClassFixture<WebApplicationFactory<Program>>
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
+
+    [Fact]
+    public async Task GetCategory_PublicEndpoint_StripsPresenterHintFromClosedQuestion()
+    {
+        var fakeService = new FakeQuizDataService(
+        [
+            new QuizCategory
+            {
+                Id = "cat1",
+                Name = "Cat 1",
+                Questions =
+                [
+                    new ClosedQuestion
+                    {
+                        Id = "q1",
+                        Prompt = "Question?",
+                        Options = [new QuizAppka.Models.AnswerOption { Id = "a", Text = "A" }],
+                        PresenterHint = "Secret hint",
+                    },
+                ],
+            },
+        ]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/categories/cat1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("Secret hint", json, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("presenterHint", json, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task GetPresenterCategory_IncludesPresenterHintInClosedQuestion()
+    {
+        var fakeService = new FakeQuizDataService(
+        [
+            new QuizCategory
+            {
+                Id = "cat1",
+                Name = "Cat 1",
+                Questions =
+                [
+                    new ClosedQuestion
+                    {
+                        Id = "q1",
+                        Prompt = "Question?",
+                        Options = [new QuizAppka.Models.AnswerOption { Id = "a", Text = "A" }],
+                        PresenterHint = "Secret hint",
+                    },
+                ],
+            },
+        ]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/presenter/categories/cat1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Secret hint", json, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task GetPresenterCategory_Returns404_WhenNotFound()
+    {
+        var fakeService = new FakeQuizDataService([]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/presenter/categories/unknown");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
 }
 
 file class FakeQuizDataService : IQuizDataService

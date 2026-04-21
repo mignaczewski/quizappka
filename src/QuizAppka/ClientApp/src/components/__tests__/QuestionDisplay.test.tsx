@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import QuestionDisplay from '../QuestionDisplay';
-import type { Question } from '../../types/quiz';
+import type { Question, RevealState } from '../../types/quiz';
 
 describe('QuestionDisplay', () => {
   it('renders OpenQuestion for open type', () => {
@@ -30,6 +30,65 @@ describe('QuestionDisplay', () => {
     };
     render(<QuestionDisplay question={q} />);
     expect(screen.getByRole('img')).toBeInTheDocument();
+  });
+
+  it('renders MemeQuestion for meme type', () => {
+    const q: Question = {
+      id: 'q1',
+      type: 'meme',
+      prompt: 'Meme question?',
+      entryImage: 'meme.jpg',
+      options: [{ id: 'a', text: 'Option A' }],
+    };
+    render(<QuestionDisplay question={q} />);
+    expect(screen.getByText('Meme question?')).toBeInTheDocument();
+    expect(screen.getByTestId('meme-image')).toBeInTheDocument();
+  });
+
+  it('passes revealState to MemeQuestion', () => {
+    const q: Question = {
+      id: 'q1',
+      type: 'meme',
+      prompt: 'Meme?',
+      entryImage: 'entry.jpg',
+      revealImage: 'reveal.jpg',
+      options: [],
+    };
+    const revealState: RevealState = { memeImageRevealed: true };
+    render(<QuestionDisplay question={q} revealState={revealState} />);
+    const img = screen.getByTestId('meme-image');
+    expect(img).toHaveAttribute('src', '/images/reveal.jpg');
+  });
+
+  it('renders SingingPianos for singing-pianos type', () => {
+    const q: Question = {
+      id: 'q1',
+      type: 'singing-pianos',
+      prompt: 'Piano?',
+      boxes: [
+        { id: 'b1', hiddenText: 'DO' },
+        { id: 'b2', hiddenText: 'RE' },
+      ],
+    };
+    render(<QuestionDisplay question={q} />);
+    expect(screen.getByText('Piano?')).toBeInTheDocument();
+    expect(screen.getAllByRole('button')).toHaveLength(2);
+  });
+
+  it('passes revealedBoxes to SingingPianos via revealState', () => {
+    const q: Question = {
+      id: 'q1',
+      type: 'singing-pianos',
+      prompt: 'Piano?',
+      boxes: [
+        { id: 'b1', hiddenText: 'DO' },
+        { id: 'b2', hiddenText: 'RE' },
+      ],
+    };
+    const revealState: RevealState = { singingPianosBoxesRevealed: [true, false] };
+    render(<QuestionDisplay question={q} revealState={revealState} />);
+    expect(screen.getByTestId('piano-box-0')).toHaveTextContent('DO');
+    expect(screen.getByTestId('piano-box-1')).toHaveTextContent('?');
   });
 
   it('renders fallback message for unknown type', () => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Alert,
@@ -8,9 +8,10 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { fetchCategory } from "../services/quizApi";
+import { fetchPresenterCategory } from "../services/quizApi";
 import { usePresenterSession } from "../hooks/usePresenterSession";
-import type { CategoryDetail, Question } from "../types/quiz";
+import { getPresenterHubConnection } from "../services/presenterHub";
+import type { CategoryDetail, Question, RevealState, SingingPianosQuestion } from "../types/quiz";
 import QuestionDisplay from "../components/QuestionDisplay";
 
 export default function QuestionDetailPage() {
@@ -28,10 +29,11 @@ export default function QuestionDetailPage() {
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [revealState, setRevealState] = useState<RevealState | null>(null);
 
   useEffect(() => {
     if (!categoryId) return;
-    fetchCategory(categoryId)
+    fetchPresenterCategory(categoryId)
       .then((data) => {
         setCategory(data);
         const found = data.questions.find((q) => q.id === questionId) ?? null;
@@ -52,6 +54,36 @@ export default function QuestionDetailPage() {
   const handleBack = () => {
     navigate(`/quiz/${categoryId}`);
   };
+
+  const onBoxReveal = useCallback(
+    (index: number) => {
+      
+      setRevealState(currentReveal => {
+        const currentBoxes = currentReveal?.singingPianosBoxesRevealed ?? (question as SingingPianosQuestion)?.boxes.map(() => false) ?? [];
+        const nextBoxes = [...currentBoxes];
+        nextBoxes[index] = true;
+        const nextReveal: RevealState = {
+          ...revealState,
+          singingPianosBoxesRevealed: nextBoxes,
+        };
+
+        getPresenterHubConnection()
+        .invoke("UpdateState", {
+          screen: "question-detail",
+          categoryId,
+          questionId,
+          revealState: nextReveal,
+        })
+        .catch(() => {
+          /* hub not connected */
+        });
+        
+        return nextReveal;
+      });
+      
+    },
+    [categoryId, questionId, revealState, question],
+  );
 
   if (loading) {
     return (
@@ -115,7 +147,31 @@ export default function QuestionDetailPage() {
       <Typography variant="h4" gutterBottom>
         {category.name}
       </Typography>
-      {question && <QuestionDisplay question={question} />}
+      {question && (
+        <QuestionDisplay
+          question={question}
+          revealState={revealState}
+          onReveal={() => {
+            const nextReveal: RevealState = {
+              ...revealState,
+              memeImageRevealed: true,
+            };
+            setRevealState(nextReveal);
+            
+            getPresenterHubConnection()
+              .invoke("UpdateState", {
+                screen: "question-detail",
+                categoryId,
+                questionId,
+                revealState: nextReveal,
+              })
+              .catch(() => {
+                /* hub not connected */
+              });
+          }}
+          onBoxReveal={onBoxReveal}
+        />
+      )}
     </Container>
   );
 }
