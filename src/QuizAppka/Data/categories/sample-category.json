@@ -5,7 +5,8 @@
     {
       "id": "q1",
       "type": "open",
-      "prompt": "What is the capital of France?"
+      "prompt": "What is the capital of France?",
+      "presenterHint": "The answer is Paris. It's known as the City of Light."
     },
     {
       "id": "q2",

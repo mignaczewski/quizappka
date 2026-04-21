@@ -1,5 +1,11 @@
 import { test, expect, type Page } from '@playwright/test';
 
+// All tests in this file share a single server-side PresenterSessionStore (singleton).
+// Running tests in parallel causes cross-test state contamination via SignalR broadcasts:
+// one test's reveal action is received by another test's mirror page.
+// Serial mode ensures tests run sequentially on one worker so state doesn't bleed.
+test.describe.configure({ mode: 'serial' });
+
 async function openMirror(presenterPage: Page): Promise<Page> {
   const context = presenterPage.context();
   const mirrorPage = await context.newPage();
