@@ -58,10 +58,14 @@ public class QuizController : ControllerBase
         return Ok(new CategoryDetail(category.Id, category.Name, category.Questions));
     }
 
-    private static Question StripPresenterData(Question question) =>
-        question is ClosedQuestion closed && closed.PresenterHint is not null
-            ? new ClosedQuestion { Id = closed.Id, Prompt = closed.Prompt, Options = closed.Options, PresenterHint = null }
-            : question;
+    private static Question StripPresenterData(Question question) => question switch
+    {
+        ClosedQuestion closed when closed.PresenterHint is not null
+            => new ClosedQuestion { Id = closed.Id, Prompt = closed.Prompt, Options = closed.Options },
+        OpenQuestion open when open.PresenterHint is not null
+            => new OpenQuestion { Id = open.Id, Prompt = open.Prompt },
+        _ => question,
+    };
 }
 
 public record CategorySummary(string Id, string Name);

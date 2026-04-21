@@ -186,6 +186,59 @@ public class QuizControllerTests : IClassFixture<WebApplicationFactory<Program>>
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
+
+    [Fact]
+    public async Task GetCategory_PublicEndpoint_StripsPresenterHintFromOpenQuestion()
+    {
+        var fakeService = new FakeQuizDataService(
+        [
+            new QuizCategory
+            {
+                Id = "cat1",
+                Name = "Cat 1",
+                Questions =
+                [
+                    new OpenQuestion { Id = "q1", Prompt = "Question?", PresenterHint = "Secret open hint" },
+                ],
+            },
+        ]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/categories/cat1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("Secret open hint", json, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("presenterHint", json, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task GetPresenterCategory_IncludesPresenterHintInOpenQuestion()
+    {
+        var fakeService = new FakeQuizDataService(
+        [
+            new QuizCategory
+            {
+                Id = "cat1",
+                Name = "Cat 1",
+                Questions =
+                [
+                    new OpenQuestion { Id = "q1", Prompt = "Question?", PresenterHint = "Secret open hint" },
+                ],
+            },
+        ]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/presenter/categories/cat1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Secret open hint", json, StringComparison.OrdinalIgnoreCase);
+    }
 }
 
 file class FakeQuizDataService : IQuizDataService

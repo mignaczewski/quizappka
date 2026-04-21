@@ -11,6 +11,7 @@ export interface BaseQuestion {
 
 export interface OpenQuestion extends BaseQuestion {
   type: 'open';
+  presenterHint?: string;
 }
 
 export interface ClosedQuestion extends BaseQuestion {

@@ -17,7 +17,7 @@
 
 **Purpose**: Confirm baseline state is stable before any change is made
 
-- [ ] T001 Verify baseline build and tests pass: run `dotnet build` and `dotnet test` in repository root, and `npm test` in `src/QuizAppka/ClientApp/`
+- [X] T001 Verify baseline build and tests pass: run `dotnet build` and `dotnet test` in repository root, and `npm test` in `src/QuizAppka/ClientApp/`
 
 ---
 
@@ -31,15 +31,15 @@
 
 > **Define and write these tests before implementation so they fail for the expected reason first.**
 
-- [ ] T002 [P] [US1] Write failing backend integration tests: assert public endpoint strips presenterHint and presenter endpoint includes presenterHint for OpenQuestion in `tests/QuizAppka.Tests/Controllers/QuizControllerTests.cs`
-- [ ] T003 [P] [US1] Write failing frontend component tests for OpenQuestion: hint absent when not set, plain-text hint renders with `data-testid="presenter-hint"`, https:// hint renders as `<Link>`, http:// hint renders as `<Link>` in `src/QuizAppka/ClientApp/src/components/__tests__/OpenQuestion.test.tsx`
+- [X] T002 [P] [US1] Write failing backend integration tests: assert public endpoint strips presenterHint and presenter endpoint includes presenterHint for OpenQuestion in `tests/QuizAppka.Tests/Controllers/QuizControllerTests.cs`
+- [X] T003 [P] [US1] Write failing frontend component tests for OpenQuestion: hint absent when not set, plain-text hint renders with `data-testid="presenter-hint"`, https:// hint renders as `<Link>`, http:// hint renders as `<Link>` in `src/QuizAppka/ClientApp/src/components/__tests__/OpenQuestion.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T004 [P] [US1] Add `PresenterHint` property with `[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]` to `OpenQuestion` class in `src/QuizAppka/Models/OpenQuestion.cs`
-- [ ] T005 [P] [US1] Add `presenterHint?: string` optional field to the `OpenQuestion` TypeScript interface in `src/QuizAppka/ClientApp/src/types/quiz.ts`
-- [ ] T006 [US1] Extend `StripPresenterData` in `QuizController` to null-out `PresenterHint` on `OpenQuestion` (pattern-match alongside existing `ClosedQuestion` arm) in `src/QuizAppka/Controllers/QuizController.cs`
-- [ ] T007 [US1] Update `OpenQuestion` component to render `presenterHint` — plain text as `<Typography data-testid="presenter-hint">` and URL (starts with `https://` or `http://`) as a `<Link target="_blank" rel="noopener noreferrer">` — mirroring `ClosedQuestion.tsx` exactly, in `src/QuizAppka/ClientApp/src/components/OpenQuestion.tsx`
+- [X] T004 [P] [US1] Add `PresenterHint` property with `[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]` to `OpenQuestion` class in `src/QuizAppka/Models/OpenQuestion.cs`
+- [X] T005 [P] [US1] Add `presenterHint?: string` optional field to the `OpenQuestion` TypeScript interface in `src/QuizAppka/ClientApp/src/types/quiz.ts`
+- [X] T006 [US1] Extend `StripPresenterData` in `QuizController` to null-out `PresenterHint` on `OpenQuestion` (pattern-match alongside existing `ClosedQuestion` arm) in `src/QuizAppka/Controllers/QuizController.cs`
+- [X] T007 [US1] Update `OpenQuestion` component to render `presenterHint` — plain text as `<Typography data-testid="presenter-hint">` and URL (starts with `https://` or `http://`) as a `<Link target="_blank" rel="noopener noreferrer">` — mirroring `ClosedQuestion.tsx` exactly, in `src/QuizAppka/ClientApp/src/components/OpenQuestion.tsx`
 
 **Checkpoint**: At this point US1 is fully functional. Run `dotnet test` and `npm test` — all tests added in T002 and T003 must now pass.
 
@@ -47,7 +47,7 @@
 
 ## Final Phase: Polish & Cross-Cutting Concerns
 
-- [ ] T008 Run full test suite (`dotnet test` + `npm run lint` + `npm test`) and confirm all checks pass with zero failures or lint errors
+- [X] T008 Run full test suite (`dotnet test` + `npm run lint` + `npm test`) and confirm all checks pass with zero failures or lint errors
 
 ---
 
