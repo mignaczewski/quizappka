@@ -99,4 +99,23 @@ describe('MirrorPage', () => {
 
     await waitFor(() => expect(screen.getByText(/2\+2/)).toBeInTheDocument());
   });
+
+  it('renders question prompt as h2 heading in question-detail mode (displayMode mirror)', async () => {
+    renderMirrorPage();
+    await waitFor(() => expect(mockStart).toHaveBeenCalled());
+
+    act(() => {
+      onStateUpdated?.({ screen: 'question-detail', categoryId: 'cat1', questionId: 'q1' });
+    });
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(/2\+2/),
+    );
+  });
+
+  it('does not render a Container element as page root (uses Grid wrapper)', async () => {
+    const { container } = renderMirrorPage();
+    await waitFor(() => expect(mockStart).toHaveBeenCalled());
+    expect(container.querySelector('.MuiContainer-root')).toBeNull();
+  });
 });

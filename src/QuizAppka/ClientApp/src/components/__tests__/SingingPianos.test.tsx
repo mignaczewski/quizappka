@@ -61,4 +61,16 @@ describe('SingingPianos', () => {
     render(<SingingPianos question={question} />);
     expect(screen.getAllByRole('button')).toHaveLength(5);
   });
+
+  describe('displayMode', () => {
+    it('renders prompt as h4 by default (presenter mode)', () => {
+      render(<SingingPianos question={question} />);
+      expect(screen.getByRole('heading', { level: 4 })).toHaveTextContent('Press to reveal!');
+    });
+
+    it('renders prompt as h2 in mirror mode', () => {
+      render(<SingingPianos question={question} displayMode="mirror" />);
+      expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Press to reveal!');
+    });
+  });
 });

@@ -39,4 +39,11 @@ describe('HomePage', () => {
     renderHomePage();
     await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
   });
+
+  it('wraps content in Grid layout (no Container root)', async () => {
+    mockFetchCategories.mockResolvedValue([{ id: 'c1', name: 'Science' }]);
+    const { container } = renderHomePage();
+    await waitFor(() => expect(screen.getByText('Science')).toBeInTheDocument());
+    expect(container.querySelector('.MuiContainer-root')).toBeNull();
+  });
 });

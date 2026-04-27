@@ -49,6 +49,8 @@ export interface RevealState {
 
 export type Question = OpenQuestion | ClosedQuestion | ImageRebusQuestion | MemeQuestion | SingingPianosQuestion;
 
+export type DisplayMode = 'presenter' | 'mirror';
+
 export interface CategorySummary {
   id: string;
   name: string;

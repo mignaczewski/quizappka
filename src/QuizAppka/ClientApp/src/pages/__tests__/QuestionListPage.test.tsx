@@ -110,4 +110,11 @@ describe('QuestionListPage', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Back to categories' }));
     expect(screen.getByTestId('category-list')).toBeInTheDocument();
   });
+
+  it('wraps content in Grid layout (no Container root)', async () => {
+    vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
+    const { container } = renderPage();
+    await waitFor(() => expect(screen.getByText('Science')).toBeInTheDocument());
+    expect(container.querySelector('.MuiContainer-root')).toBeNull();
+  });
 });

@@ -25,7 +25,7 @@ describe('ClosedQuestion', () => {
 
   it('option count matches input', () => {
     render(<ClosedQuestion question={question} />);
-    expect(screen.getAllByRole('listitem')).toHaveLength(3);
+    expect(screen.getAllByTestId('answer-option')).toHaveLength(3);
   });
 
   it('does not render any image', () => {
@@ -57,5 +57,39 @@ describe('ClosedQuestion', () => {
     render(<ClosedQuestion question={withHint} />);
     const link = screen.getByRole('link');
     expect(link).toHaveAttribute('href', 'http://example.com/hint');
+  });
+
+  describe('displayMode', () => {
+    it('renders prompt as h4 by default (presenter mode)', () => {
+      render(<ClosedQuestion question={question} />);
+      expect(screen.getByRole('heading', { level: 4 })).toHaveTextContent('Which planet is closest to the Sun?');
+    });
+
+    it('renders prompt as h2 in mirror mode', () => {
+      render(<ClosedQuestion question={question} displayMode="mirror" />);
+      expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Which planet is closest to the Sun?');
+    });
+
+    it('renders options as Paper cards (data-testid=answer-option), not list items', () => {
+      render(<ClosedQuestion question={question} />);
+      expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
+      expect(screen.getAllByTestId('answer-option')).toHaveLength(3);
+    });
+
+    it('option text uses h5 variant in presenter mode', () => {
+      render(<ClosedQuestion question={question} />);
+      expect(screen.getByRole('heading', { level: 5, name: 'Mercury' })).toBeInTheDocument();
+    });
+
+    it('option text uses h4 variant in mirror mode', () => {
+      render(<ClosedQuestion question={question} displayMode="mirror" />);
+      expect(screen.getByRole('heading', { level: 4, name: 'Mercury' })).toBeInTheDocument();
+    });
+
+    it('hides presenter hint in mirror mode', () => {
+      const withHint: ClosedQuestionType = { ...question, presenterHint: 'The answer is Mercury.' };
+      render(<ClosedQuestion question={withHint} displayMode="mirror" />);
+      expect(screen.queryByTestId('presenter-hint')).not.toBeInTheDocument();
+    });
   });
 });

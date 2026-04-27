@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Alert, Button, CircularProgress, Container, Typography } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Typography } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import CategoryList from '../components/CategoryList';
 import { fetchCategories } from '../services/quizApi';
 import { usePresenterSession } from '../hooks/usePresenterSession';
@@ -25,33 +26,45 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <Container sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress role="progressbar" />
-      </Container>
+      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+        <Grid container columns={12}>
+          <Grid size={10} offset={1} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress role="progressbar" />
+          </Grid>
+        </Grid>
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <Container sx={{ mt: 4 }}>
-        <Alert severity="error" role="alert">{error}</Alert>
-      </Container>
+      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+        <Grid container columns={12}>
+          <Grid size={10} offset={1}>
+            <Alert severity="error" role="alert">{error}</Alert>
+          </Grid>
+        </Grid>
+      </Box>
     );
   }
 
   return (
-    <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom>Quiz Categories</Typography>
-      <Button
-        variant="outlined"
-        href="/mirror"
-        target="_blank"
-        rel="noopener noreferrer"
-        sx={{ mb: 2 }}
-      >
-        Open Mirror View
-      </Button>
-      <CategoryList categories={categories} />
-    </Container>
+    <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+      <Grid container columns={12}>
+        <Grid size={10} offset={1}>
+          <Typography variant="h4" gutterBottom>Quiz Categories</Typography>
+          <Button
+            variant="outlined"
+            href="/mirror"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ mb: 2 }}
+          >
+            Open Mirror View
+          </Button>
+          <CategoryList categories={categories} />
+        </Grid>
+      </Grid>
+    </Box>
   );
 }

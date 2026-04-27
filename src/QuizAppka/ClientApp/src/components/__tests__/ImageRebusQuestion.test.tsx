@@ -31,4 +31,28 @@ describe('ImageRebusQuestion', () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
     expect(screen.getByText('Image unavailable')).toBeInTheDocument();
   });
+
+  describe('displayMode', () => {
+    it('renders prompt as h4 by default (presenter mode)', () => {
+      render(<ImageRebusQuestion question={question} />);
+      expect(screen.getByRole('heading', { level: 4 })).toHaveTextContent('What is in the image?');
+    });
+
+    it('renders prompt as h2 in mirror mode', () => {
+      render(<ImageRebusQuestion question={question} displayMode="mirror" />);
+      expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('What is in the image?');
+    });
+
+    it('image has maxHeight 70vh by default (presenter mode)', () => {
+      render(<ImageRebusQuestion question={question} />);
+      const img = screen.getByRole('img');
+      expect(img).toHaveStyle({ maxHeight: '70vh' });
+    });
+
+    it('image has maxHeight 80vh in mirror mode', () => {
+      render(<ImageRebusQuestion question={question} displayMode="mirror" />);
+      const img = screen.getByRole('img');
+      expect(img).toHaveStyle({ maxHeight: '80vh' });
+    });
+  });
 });

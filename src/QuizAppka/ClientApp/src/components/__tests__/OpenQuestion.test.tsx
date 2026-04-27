@@ -40,4 +40,26 @@ describe('OpenQuestion', () => {
     const link = screen.getByRole('link');
     expect(link).toHaveAttribute('href', 'http://example.com/hint');
   });
+
+  describe('displayMode', () => {
+    it('renders prompt as h4 by default (presenter mode)', () => {
+      render(<OpenQuestion question={{ id: 'q1', type: 'open', prompt: 'Presenter prompt?' }} />);
+      expect(screen.getByRole('heading', { level: 4 })).toHaveTextContent('Presenter prompt?');
+    });
+
+    it('renders prompt as h2 in mirror mode', () => {
+      render(<OpenQuestion question={{ id: 'q1', type: 'open', prompt: 'Mirror prompt?' }} displayMode="mirror" />);
+      expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Mirror prompt?');
+    });
+
+    it('shows presenter hint by default', () => {
+      render(<OpenQuestion question={{ id: 'q1', type: 'open', prompt: 'A?', presenterHint: 'Hint text' }} />);
+      expect(screen.getByTestId('presenter-hint')).toBeInTheDocument();
+    });
+
+    it('hides presenter hint in mirror mode', () => {
+      render(<OpenQuestion question={{ id: 'q1', type: 'open', prompt: 'A?', presenterHint: 'Hint text' }} displayMode="mirror" />);
+      expect(screen.queryByTestId('presenter-hint')).not.toBeInTheDocument();
+    });
+  });
 });

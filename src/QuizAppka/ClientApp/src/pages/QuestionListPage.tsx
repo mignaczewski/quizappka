@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Alert, Button, CircularProgress, Container, Typography } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Typography } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { fetchCategory } from '../services/quizApi';
 import { usePresenterSession } from '../hooks/usePresenterSession';
 import type { CategoryDetail } from '../types/quiz';
@@ -29,17 +30,25 @@ export default function QuestionListPage() {
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress role="progressbar" />
-      </Container>
+      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+        <Grid container columns={12}>
+          <Grid size={10} offset={1} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress role="progressbar" />
+          </Grid>
+        </Grid>
+      </Box>
     );
   }
 
   if (error || !category) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Alert severity="error" role="alert">{error ?? 'Category not found'}</Alert>
-      </Container>
+      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+        <Grid container columns={12}>
+          <Grid size={10} offset={1}>
+            <Alert severity="error" role="alert">{error ?? 'Category not found'}</Alert>
+          </Grid>
+        </Grid>
+      </Box>
     );
   }
 
@@ -48,18 +57,22 @@ export default function QuestionListPage() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Button variant="text" onClick={() => navigate('/')} sx={{ mb: 2 }} aria-label="Back to categories">
-        ← Back to categories
-      </Button>
-      <Typography variant="h4" gutterBottom>{category.name}</Typography>
-      <Typography variant="body1" color="text.secondary" gutterBottom>
-        {category.questions.length} question{category.questions.length !== 1 ? 's' : ''}
-      </Typography>
-      <QuestionList
-        questions={category.questions}
-        onSelectQuestion={handleSelectQuestion}
-      />
-    </Container>
+    <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+      <Grid container columns={12}>
+        <Grid size={10} offset={1}>
+          <Button variant="text" onClick={() => navigate('/')} sx={{ mb: 2 }} aria-label="Back to categories">
+            ← Back to categories
+          </Button>
+          <Typography variant="h4" gutterBottom>{category.name}</Typography>
+          <Typography variant="body1" color="text.secondary" gutterBottom>
+            {category.questions.length} question{category.questions.length !== 1 ? 's' : ''}
+          </Typography>
+          <QuestionList
+            questions={category.questions}
+            onSelectQuestion={handleSelectQuestion}
+          />
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
