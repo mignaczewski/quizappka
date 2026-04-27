@@ -1,17 +1,29 @@
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import type { ImageRebusQuestion as ImageRebusQuestionType } from '../types/quiz';
+import type { ImageRebusQuestion as ImageRebusQuestionType, DisplayMode } from '../types/quiz';
 
 interface Props {
   question: ImageRebusQuestionType;
+  displayMode?: DisplayMode;
 }
 
-export default function ImageRebusQuestion({ question }: Props) {
+export default function ImageRebusQuestion({ question, displayMode }: Props) {
   const [imgError, setImgError] = useState(false);
+  const isMirror = displayMode === 'mirror';
+  const maxHeight = isMirror ? '80vh' : '70vh';
 
   return (
     <Box>
-      <Box sx={{ mb: 2 }}>
+      <Box
+        sx={{
+          width: '100%',
+          maxHeight,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          mb: 2,
+        }}
+      >
         {imgError ? (
           <Box
             sx={{
@@ -34,12 +46,12 @@ export default function ImageRebusQuestion({ question }: Props) {
             src={`/images/${question.imageRef}`}
             alt={question.prompt}
             onError={() => setImgError(true)}
-            style={{ maxWidth: '100%', maxHeight: 400 }}
+            style={{ maxWidth: '100%', maxHeight, objectFit: 'contain' }}
           />
         )}
       </Box>
       {question.prompt && (
-        <Typography variant="h6">{question.prompt}</Typography>
+        <Typography variant={isMirror ? 'h2' : 'h4'}>{question.prompt}</Typography>
       )}
     </Box>
   );

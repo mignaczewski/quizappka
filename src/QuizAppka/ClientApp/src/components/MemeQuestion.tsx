@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
-import { Box, Button, List, ListItem, ListItemText, Typography } from '@mui/material';
-import type { MemeQuestion as MemeQuestionType } from '../types/quiz';
+import { Box, Button, Paper, Stack, Typography } from '@mui/material';
+import type { MemeQuestion as MemeQuestionType, DisplayMode } from '../types/quiz';
 
 interface Props {
   question: MemeQuestionType;
   revealImage?: boolean | null;
   onReveal?: () => void;
+  displayMode?: DisplayMode;
 }
 
-export default function MemeQuestion({ question, revealImage, onReveal }: Props) {
+export default function MemeQuestion({ question, revealImage, onReveal, displayMode }: Props) {
   const [imgError, setImgError] = useState(false);
+  const isMirror = displayMode === 'mirror';
+  const maxHeight = isMirror ? '80vh' : '70vh';
 
   const imageSrc = revealImage && question.revealImage
     ? `/images/${question.revealImage}`
@@ -21,8 +24,17 @@ export default function MemeQuestion({ question, revealImage, onReveal }: Props)
 
   return (
     <>
-      <Typography variant="h6">{question.prompt}</Typography>
-      <Box sx={{ my: 2 }}>
+      <Typography variant={isMirror ? 'h2' : 'h4'}>{question.prompt}</Typography>
+      <Box
+        sx={{
+          width: '100%',
+          maxHeight,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          my: 2,
+        }}
+      >
         {imgError ? (
           <Box
             sx={{
@@ -46,7 +58,7 @@ export default function MemeQuestion({ question, revealImage, onReveal }: Props)
             alt={revealImage && question.revealImage ? 'Revealed meme' : question.prompt}
             data-testid="meme-image"
             onError={() => setImgError(true)}
-            style={{ maxWidth: '100%', maxHeight: 400 }}
+            style={{ maxWidth: '100%', maxHeight, objectFit: 'contain' }}
           />
         )}
       </Box>
@@ -60,13 +72,13 @@ export default function MemeQuestion({ question, revealImage, onReveal }: Props)
           Reveal Image
         </Button>
       )}
-      <List>
+      <Stack spacing={1.5} sx={{ mt: 2 }}>
         {question.options.map((option) => (
-          <ListItem key={option.id}>
-            <ListItemText primary={option.text} />
-          </ListItem>
+          <Paper key={option.id} elevation={1} sx={{ px: 3, py: 2 }} data-testid="answer-option">
+            <Typography variant={isMirror ? 'h4' : 'h5'}>{option.text}</Typography>
+          </Paper>
         ))}
-      </List>
+      </Stack>
     </>
   );
 }

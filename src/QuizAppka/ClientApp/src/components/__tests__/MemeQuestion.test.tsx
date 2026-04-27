@@ -60,4 +60,44 @@ describe('MemeQuestion', () => {
     render(<MemeQuestion question={question} />);
     expect(screen.queryByTestId('reveal-image-button')).not.toBeInTheDocument();
   });
+
+  describe('displayMode', () => {
+    it('renders prompt as h4 by default (presenter mode)', () => {
+      render(<MemeQuestion question={question} />);
+      expect(screen.getByRole('heading', { level: 4 })).toHaveTextContent('Which meme is this?');
+    });
+
+    it('renders prompt as h2 in mirror mode', () => {
+      render(<MemeQuestion question={question} displayMode="mirror" />);
+      expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Which meme is this?');
+    });
+
+    it('image has maxHeight 70vh by default (presenter mode)', () => {
+      render(<MemeQuestion question={question} />);
+      const img = screen.getByTestId('meme-image');
+      expect(img).toHaveStyle({ maxHeight: '70vh' });
+    });
+
+    it('image has maxHeight 80vh in mirror mode', () => {
+      render(<MemeQuestion question={question} displayMode="mirror" />);
+      const img = screen.getByTestId('meme-image');
+      expect(img).toHaveStyle({ maxHeight: '80vh' });
+    });
+
+    it('renders options as Paper cards (data-testid=answer-option)', () => {
+      render(<MemeQuestion question={question} />);
+      expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
+      expect(screen.getAllByTestId('answer-option')).toHaveLength(2);
+    });
+
+    it('option text uses h5 variant in presenter mode', () => {
+      render(<MemeQuestion question={question} />);
+      expect(screen.getByRole('heading', { level: 5, name: 'Option A' })).toBeInTheDocument();
+    });
+
+    it('option text uses h4 variant in mirror mode', () => {
+      render(<MemeQuestion question={question} displayMode="mirror" />);
+      expect(screen.getByRole('heading', { level: 4, name: 'Option A' })).toBeInTheDocument();
+    });
+  });
 });

@@ -136,5 +136,12 @@ describe('QuestionDetailPage', () => {
       expect(screen.getByRole('button', { name: 'Back to questions' })).toBeInTheDocument();
     });
   });
+
+  it('wraps content in Grid layout (no Container root)', async () => {
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
+    const { container } = renderPage();
+    await waitFor(() => expect(screen.getByText('Science')).toBeInTheDocument());
+    expect(container.querySelector('.MuiContainer-root')).toBeNull();
+  });
 });
 

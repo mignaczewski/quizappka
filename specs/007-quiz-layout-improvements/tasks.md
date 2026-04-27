@@ -19,7 +19,7 @@
 
 **Purpose**: Verify baseline passes and confirm tooling before any layout changes.
 
-- [ ] T001 Run `npm run lint`, `npm run type-check`, and `npm run test` in `src/QuizAppka/ClientApp/` to confirm all checks pass before changes begin
+- [X] T001 Run `npm run lint`, `npm run type-check`, and `npm run test` in `src/QuizAppka/ClientApp/` to confirm all checks pass before changes begin
 
 ---
 
@@ -29,8 +29,8 @@
 
 **⚠️ CRITICAL**: No user story component work can begin until T002 and T003 are complete.
 
-- [ ] T002 Add `export type DisplayMode = 'presenter' | 'mirror';` to `src/types/quiz.ts`
-- [ ] T003 Update `src/components/QuestionDisplay.tsx`: add `displayMode?: DisplayMode` to the `Props` interface and forward the prop to `OpenQuestion`, `ClosedQuestion`, `ImageRebusQuestion`, `MemeQuestion`, and `SingingPianos` child renders
+- [X] T002 Add `export type DisplayMode = 'presenter' | 'mirror';` to `src/types/quiz.ts`
+- [X] T003 Update `src/components/QuestionDisplay.tsx`: add `displayMode?: DisplayMode` to the `Props` interface and forward the prop to `OpenQuestion`, `ClosedQuestion`, `ImageRebusQuestion`, `MemeQuestion`, and `SingingPianos` child renders
 
 **Checkpoint**: `DisplayMode` type exported and `QuestionDisplay` forwarding prop — component story work can now begin in parallel.
 
@@ -46,21 +46,21 @@
 
 > Write these tests before implementing. Run `npm run test` after adding them — they should fail for the correct structural reason before the implementation tasks are done.
 
-- [ ] T004 [P] [US1] Update `src/components/__tests__/OpenQuestion.test.tsx`: add tests asserting that `displayMode='mirror'` renders prompt as `h2` element and hides presenter hint, and that default (presenter) renders prompt as `h4` with hint visible
-- [ ] T005 [P] [US1] Update `src/components/__tests__/ClosedQuestion.test.tsx`: add tests asserting that options render as `Paper` cards (not `listitem` roles) in both modes, prompt is `h2` in mirror and `h4` in presenter, and hint is hidden in mirror mode
-- [ ] T006 [P] [US1] Update `src/components/__tests__/ImageRebusQuestion.test.tsx`: add tests asserting that the image container has `maxHeight` of `80vh` when `displayMode='mirror'` and `70vh` in presenter mode, and prompt scales accordingly
-- [ ] T007 [P] [US1] Update `src/components/__tests__/MemeQuestion.test.tsx`: add tests asserting image container `maxHeight` scales with `displayMode`, options render as `Paper` cards in both modes, and reveal button is not rendered when `onReveal` is absent
-- [ ] T008 [P] [US1] Update `src/components/__tests__/SingingPianos.test.tsx`: add tests asserting that boxes are rendered inside a MUI Grid structure (each box `Button` has `fullWidth` and scaled `minHeight` per `displayMode`) and that prompt uses `h2` in mirror and `h4` in presenter
-- [ ] T009 [P] [US1] Update `src/pages/__tests__/MirrorPage.test.tsx`: add tests asserting that the question-detail render path passes `displayMode='mirror'` to `QuestionDisplay` and that the page root uses a `Grid` wrapper instead of `Container`
+- [X] T004 [P] [US1] Update `src/components/__tests__/OpenQuestion.test.tsx`: add tests asserting that `displayMode='mirror'` renders prompt as `h2` element and hides presenter hint, and that default (presenter) renders prompt as `h4` with hint visible
+- [X] T005 [P] [US1] Update `src/components/__tests__/ClosedQuestion.test.tsx`: add tests asserting that options render as `Paper` cards (not `listitem` roles) in both modes, prompt is `h2` in mirror and `h4` in presenter, and hint is hidden in mirror mode
+- [X] T006 [P] [US1] Update `src/components/__tests__/ImageRebusQuestion.test.tsx`: add tests asserting that the image container has `maxHeight` of `80vh` when `displayMode='mirror'` and `70vh` in presenter mode, and prompt scales accordingly
+- [X] T007 [P] [US1] Update `src/components/__tests__/MemeQuestion.test.tsx`: add tests asserting image container `maxHeight` scales with `displayMode`, options render as `Paper` cards in both modes, and reveal button is not rendered when `onReveal` is absent
+- [X] T008 [P] [US1] Update `src/components/__tests__/SingingPianos.test.tsx`: add tests asserting that boxes are rendered inside a MUI Grid structure (each box `Button` has `fullWidth` and scaled `minHeight` per `displayMode`) and that prompt uses `h2` in mirror and `h4` in presenter
+- [X] T009 [P] [US1] Update `src/pages/__tests__/MirrorPage.test.tsx`: add tests asserting that the question-detail render path passes `displayMode='mirror'` to `QuestionDisplay` and that the page root uses a `Grid` wrapper instead of `Container`
 
 ### Implementation for User Story 1
 
-- [ ] T010 [P] [US1] Update `src/components/OpenQuestion.tsx`: add `displayMode?: DisplayMode` prop; render prompt with `variant={displayMode === 'mirror' ? 'h2' : 'h4'}`; hide presenter hint when `displayMode === 'mirror'`
-- [ ] T011 [P] [US1] Update `src/components/ClosedQuestion.tsx`: add `displayMode?: DisplayMode` prop; replace `List`/`ListItem`/`ListItemText` options with `Stack` of `Paper elevation={1}` cards; prompt variant `h2`/`h4`; option text variant `h4`/`h5`; hide hint in mirror
-- [ ] T012 [P] [US1] Update `src/components/ImageRebusQuestion.tsx`: add `displayMode?: DisplayMode` prop; wrap `img` in `Box` with `sx={{ width: '100%', maxHeight: displayMode === 'mirror' ? '80vh' : '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}`; set `style={{ maxWidth: '100%', maxHeight: 'inherit', objectFit: 'contain' }}` on `img`; prompt variant `h2`/`h4`
-- [ ] T013 [P] [US1] Update `src/components/MemeQuestion.tsx`: add `displayMode?: DisplayMode` prop; apply same `vh`-based image container as T012; replace `List`/`ListItem` options with `Stack` of `Paper` cards; prompt variant `h2`/`h4`; option text variant `h4`/`h5`
-- [ ] T014 [P] [US1] Update `src/components/SingingPianos.tsx`: add `displayMode?: DisplayMode` prop; replace `Box` flex-wrap with `Grid container columns={4} spacing={2}`; render each box as `Grid size={1}` containing a `fullWidth` `Button`; set `minHeight` to `140px`/`100px` and `fontSize` to `'2rem'`/`'1.5rem'` per `displayMode`; prompt variant `h2`/`h4`
-- [ ] T015 [US1] Update `src/pages/MirrorPage.tsx`: replace all `<Container>` usages with `<Box sx={{ width: '100%', minHeight: '100vh', pt: 4 }}><Grid container columns={12}><Grid size={10} offset={1}>…</Grid></Grid></Box>`; pass `displayMode='mirror'` to `<QuestionDisplay>` in the question-detail render path (depends on T003, T010–T014)
+- [X] T010 [P] [US1] Update `src/components/OpenQuestion.tsx`: add `displayMode?: DisplayMode` prop; render prompt with `variant={displayMode === 'mirror' ? 'h2' : 'h4'}`; hide presenter hint when `displayMode === 'mirror'`
+- [X] T011 [P] [US1] Update `src/components/ClosedQuestion.tsx`: add `displayMode?: DisplayMode` prop; replace `List`/`ListItem`/`ListItemText` options with `Stack` of `Paper elevation={1}` cards; prompt variant `h2`/`h4`; option text variant `h4`/`h5`; hide hint in mirror
+- [X] T012 [P] [US1] Update `src/components/ImageRebusQuestion.tsx`: add `displayMode?: DisplayMode` prop; wrap `img` in `Box` with `sx={{ width: '100%', maxHeight: displayMode === 'mirror' ? '80vh' : '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}`; set `style={{ maxWidth: '100%', maxHeight: 'inherit', objectFit: 'contain' }}` on `img`; prompt variant `h2`/`h4`
+- [X] T013 [P] [US1] Update `src/components/MemeQuestion.tsx`: add `displayMode?: DisplayMode` prop; apply same `vh`-based image container as T012; replace `List`/`ListItem` options with `Stack` of `Paper` cards; prompt variant `h2`/`h4`; option text variant `h4`/`h5`
+- [X] T014 [P] [US1] Update `src/components/SingingPianos.tsx`: add `displayMode?: DisplayMode` prop; replace `Box` flex-wrap with `Grid container columns={4} spacing={2}`; render each box as `Grid size={1}` containing a `fullWidth` `Button`; set `minHeight` to `140px`/`100px` and `fontSize` to `'2rem'`/`'1.5rem'` per `displayMode`; prompt variant `h2`/`h4`
+- [X] T015 [US1] Update `src/pages/MirrorPage.tsx`: replace all `<Container>` usages with `<Box sx={{ width: '100%', minHeight: '100vh', pt: 4 }}><Grid container columns={12}><Grid size={10} offset={1}>…</Grid></Grid></Box>`; pass `displayMode='mirror'` to `<QuestionDisplay>` in the question-detail render path (depends on T003, T010–T014)
 
 **Checkpoint**: User Story 1 fully functional — mirror view shows all question types with large text, block options, and full-height images. All T004–T009 tests pass.
 
@@ -74,11 +74,11 @@
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T016 [P] [US2] Update `src/pages/__tests__/QuestionDetailPage.test.tsx`: add test asserting that the page renders a `Grid` wrapper (not a `Container`) and that `QuestionDisplay` receives no `displayMode` prop (or receives `undefined`/`'presenter'`), confirming back navigation buttons remain visible
+- [X] T016 [P] [US2] Update `src/pages/__tests__/QuestionDetailPage.test.tsx`: add test asserting that the page renders a `Grid` wrapper (not a `Container`) and that `QuestionDisplay` receives no `displayMode` prop (or receives `undefined`/`'presenter'`), confirming back navigation buttons remain visible
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] Update `src/pages/QuestionDetailPage.tsx`: replace `<Container maxWidth="lg">` with `<Box sx={{ width: '100%', minHeight: '100vh', pt: 4 }}><Grid container columns={12}><Grid size={10} offset={1}>…</Grid></Grid></Box>`; do not pass `displayMode` to `<QuestionDisplay>` (presenter default applies automatically via T003 updates)
+- [X] T017 [US2] Update `src/pages/QuestionDetailPage.tsx`: replace `<Container maxWidth="lg">` with `<Box sx={{ width: '100%', minHeight: '100vh', pt: 4 }}><Grid container columns={12}><Grid size={10} offset={1}>…</Grid></Grid></Box>`; do not pass `displayMode` to `<QuestionDisplay>` (presenter default applies automatically via T003 updates)
 
 **Checkpoint**: User Story 2 complete — presenter question-detail page uses Grid layout and inherits all component layout improvements from Phase 3. All T016 tests pass.
 
@@ -92,13 +92,13 @@
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T018 [P] [US3] Update `src/pages/__tests__/HomePage.test.tsx`: add test asserting the page renders a `Grid` wrapper structure (not a `Container` at root level)
-- [ ] T019 [P] [US3] Update `src/pages/__tests__/QuestionListPage.test.tsx`: add test asserting the page renders a `Grid` wrapper structure
+- [X] T018 [P] [US3] Update `src/pages/__tests__/HomePage.test.tsx`: add test asserting the page renders a `Grid` wrapper structure (not a `Container` at root level)
+- [X] T019 [P] [US3] Update `src/pages/__tests__/QuestionListPage.test.tsx`: add test asserting the page renders a `Grid` wrapper structure
 
 ### Implementation for User Story 3
 
-- [ ] T020 [P] [US3] Update `src/pages/HomePage.tsx`: replace `<Container sx={{ mt: 4 }}>` with `<Box sx={{ width: '100%', minHeight: '100vh', pt: 4 }}><Grid container columns={12}><Grid size={10} offset={1}>…</Grid></Grid></Box>`
-- [ ] T021 [P] [US3] Update `src/pages/QuestionListPage.tsx`: replace `<Container maxWidth="lg" sx={{ mt: 4 }}>` with the same `Box`+`Grid` wrapper pattern as T020
+- [X] T020 [P] [US3] Update `src/pages/HomePage.tsx`: replace `<Container sx={{ mt: 4 }}>` with `<Box sx={{ width: '100%', minHeight: '100vh', pt: 4 }}><Grid container columns={12}><Grid size={10} offset={1}>…</Grid></Grid></Box>`
+- [X] T021 [P] [US3] Update `src/pages/QuestionListPage.tsx`: replace `<Container maxWidth="lg" sx={{ mt: 4 }}>` with the same `Box`+`Grid` wrapper pattern as T020
 
 **Checkpoint**: All three user stories independently functional. Full layout consistent across all presenter navigation and mirror view. All T018–T019 tests pass.
 
@@ -108,8 +108,8 @@
 
 **Purpose**: Final quality gate and validation.
 
-- [ ] T022 Run full quality gate in `src/QuizAppka/ClientApp/`: `npm run lint && npm run type-check && npm run test` — all must exit with code 0
-- [ ] T023 [P] Verify `specs/007-quiz-layout-improvements/quickstart.md` manual checklist against the running application (mirror view + presenter view + navigation pages)
+- [X] T022 Run full quality gate in `src/QuizAppka/ClientApp/`: `npm run lint && npm run type-check && npm run test` — all must exit with code 0
+- [X] T023 [P] Verify `specs/007-quiz-layout-improvements/quickstart.md` manual checklist against the running application (mirror view + presenter view + navigation pages)
 
 ---
 

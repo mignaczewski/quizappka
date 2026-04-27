@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import {
   Alert,
+  Box,
   CircularProgress,
-  Container,
   List,
   ListItem,
   ListItemText,
   Snackbar,
   Typography,
 } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { fetchCategories, fetchCategory } from '../services/quizApi';
 import { getPresenterHubConnection, startPresenterHub } from '../services/presenterHub';
 import QuestionList from '../components/QuestionList';
@@ -97,9 +98,13 @@ export default function MirrorPage() {
 
   if (!connected) {
     return (
-      <Container sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress role="progressbar" aria-label="Connecting to presenter" />
-      </Container>
+      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+        <Grid container columns={12}>
+          <Grid size={10} offset={1} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress role="progressbar" aria-label="Connecting to presenter" />
+          </Grid>
+        </Grid>
+      </Box>
     );
   }
 
@@ -113,71 +118,96 @@ export default function MirrorPage() {
 
   if (mirrorScreen.screen === 'idle') {
     return (
-      <Container sx={{ mt: 4 }}>
-        {reconnectingBanner}
-        <Alert severity="info" role="status">
-          Waiting for presenter to start…
-        </Alert>
-      </Container>
+      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+        <Grid container columns={12}>
+          <Grid size={10} offset={1}>
+            {reconnectingBanner}
+            <Alert severity="info" role="status">
+              Waiting for presenter to start…
+            </Alert>
+          </Grid>
+        </Grid>
+      </Box>
     );
   }
 
   if (mirrorScreen.screen === 'category-list') {
     return (
-      <Container sx={{ mt: 4 }}>
-        {reconnectingBanner}
-        <Typography variant="h4" gutterBottom>
-          Quiz Categories
-        </Typography>
-        <List>
-          {categories.map((cat) => (
-            <ListItem key={cat.id}>
-              <ListItemText primary={cat.name} />
-            </ListItem>
-          ))}
-        </List>
-      </Container>
+      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+        <Grid container columns={12}>
+          <Grid size={10} offset={1}>
+            {reconnectingBanner}
+            <Typography variant="h4" gutterBottom>
+              Quiz Categories
+            </Typography>
+            <List>
+              {categories.map((cat) => (
+                <ListItem key={cat.id}>
+                  <ListItemText primary={cat.name} />
+                </ListItem>
+              ))}
+            </List>
+          </Grid>
+        </Grid>
+      </Box>
     );
   }
 
   if (mirrorScreen.screen === 'question-list') {
     if (!category) {
       return (
-        <Container sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-          <CircularProgress role="progressbar" />
-        </Container>
+        <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+          <Grid container columns={12}>
+            <Grid size={10} offset={1} sx={{ display: 'flex', justifyContent: 'center' }}>
+              <CircularProgress role="progressbar" />
+            </Grid>
+          </Grid>
+        </Box>
       );
     }
     return (
-      <Container sx={{ mt: 4 }}>
-        {reconnectingBanner}
-        <Typography variant="h4" gutterBottom>
-          {category.name}
-        </Typography>
-        <QuestionList questions={category.questions} onSelectQuestion={() => {}} />
-      </Container>
+      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+        <Grid container columns={12}>
+          <Grid size={10} offset={1}>
+            {reconnectingBanner}
+            <Typography variant="h4" gutterBottom>
+              {category.name}
+            </Typography>
+            <QuestionList questions={category.questions} onSelectQuestion={() => {}} />
+          </Grid>
+        </Grid>
+      </Box>
     );
   }
 
   if (mirrorScreen.screen === 'question-detail') {
     if (!category) {
       return (
-        <Container sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-          <CircularProgress role="progressbar" />
-        </Container>
+        <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+          <Grid container columns={12}>
+            <Grid size={10} offset={1} sx={{ display: 'flex', justifyContent: 'center' }}>
+              <CircularProgress role="progressbar" />
+            </Grid>
+          </Grid>
+        </Box>
       );
     }
     return (
-      <Container sx={{ mt: 4 }}>
-        {reconnectingBanner}
-        <Typography variant="h4" gutterBottom>
-          {category.name}
-        </Typography>
-        {question && <QuestionDisplay question={question} revealState={revealState} />}
-      </Container>
+      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+        <Grid container columns={12}>
+          <Grid size={10} offset={1}>
+            {reconnectingBanner}
+            <Typography variant="h4" gutterBottom>
+              {category.name}
+            </Typography>
+            {question && (
+              <QuestionDisplay question={question} revealState={revealState} displayMode="mirror" />
+            )}
+          </Grid>
+        </Grid>
+      </Box>
     );
   }
 
   return null;
 }
-

@@ -2,12 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Alert,
+  Box,
   Button,
   CircularProgress,
-  Container,
   Stack,
   Typography,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import { fetchPresenterCategory } from "../services/quizApi";
 import { usePresenterSession } from "../hooks/usePresenterSession";
 import { getPresenterHubConnection } from "../services/presenterHub";
@@ -87,91 +88,100 @@ export default function QuestionDetailPage() {
 
   if (loading) {
     return (
-      <Container
-        maxWidth="lg"
-        sx={{ mt: 4, display: "flex", justifyContent: "center" }}
-      >
-        <CircularProgress role="progressbar" />
-      </Container>
+      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+        <Grid container columns={12}>
+          <Grid size={10} offset={1} sx={{ display: "flex", justifyContent: "center" }}>
+            <CircularProgress role="progressbar" />
+          </Grid>
+        </Grid>
+      </Box>
     );
   }
 
   if (error || !category) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Stack direction="row" spacing={2}>
-          <Button
-            variant="text"
-            onClick={() => navigate("/")}
-            sx={{ mb: 1 }}
-            aria-label="Back to categories"
-          >
-            ← Back to categories
-          </Button>
-          <Button
-            variant="text"
-            onClick={handleBack}
-            sx={{ mb: 2 }}
-            aria-label="Back to questions"
-          >
-            ← Back to questions
-          </Button>
-        </Stack>
-        <Alert severity="error" role="alert">
-          {error ?? "Category not found"}
-        </Alert>
-      </Container>
+      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+        <Grid container columns={12}>
+          <Grid size={10} offset={1}>
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="text"
+                onClick={() => navigate("/")}
+                sx={{ mb: 1 }}
+                aria-label="Back to categories"
+              >
+                ← Back to categories
+              </Button>
+              <Button
+                variant="text"
+                onClick={handleBack}
+                sx={{ mb: 2 }}
+                aria-label="Back to questions"
+              >
+                ← Back to questions
+              </Button>
+            </Stack>
+            <Alert severity="error" role="alert">
+              {error ?? "Category not found"}
+            </Alert>
+          </Grid>
+        </Grid>
+      </Box>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Stack direction="row" spacing={2}>
-        <Button
-          variant="text"
-          onClick={() => navigate("/")}
-          sx={{ mb: 1 }}
-          aria-label="Back to categories"
-        >
-          ← Back to categories
-        </Button>
-        <Button
-          variant="text"
-          onClick={handleBack}
-          sx={{ mb: 2 }}
-          aria-label="Back to questions"
-        >
-          ← Back to questions
-        </Button>
-      </Stack>
-      <Typography variant="h4" gutterBottom>
-        {category.name}
-      </Typography>
-      {question && (
-        <QuestionDisplay
-          question={question}
-          revealState={revealState}
-          onReveal={() => {
-            const nextReveal: RevealState = {
-              ...revealState,
-              memeImageRevealed: true,
-            };
-            setRevealState(nextReveal);
-            
-            getPresenterHubConnection()
-              .invoke("UpdateState", {
-                screen: "question-detail",
-                categoryId,
-                questionId,
-                revealState: nextReveal,
-              })
-              .catch(() => {
-                /* hub not connected */
-              });
-          }}
-          onBoxReveal={onBoxReveal}
-        />
-      )}
-    </Container>
+    <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+      <Grid container columns={12}>
+        <Grid size={10} offset={1}>
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="text"
+              onClick={() => navigate("/")}
+              sx={{ mb: 1 }}
+              aria-label="Back to categories"
+            >
+              ← Back to categories
+            </Button>
+            <Button
+              variant="text"
+              onClick={handleBack}
+              sx={{ mb: 2 }}
+              aria-label="Back to questions"
+            >
+              ← Back to questions
+            </Button>
+          </Stack>
+          <Typography variant="h4" gutterBottom>
+            {category.name}
+          </Typography>
+          {question && (
+            <QuestionDisplay
+              question={question}
+              revealState={revealState}
+              onReveal={() => {
+                const nextReveal: RevealState = {
+                  ...revealState,
+                  memeImageRevealed: true,
+                };
+                setRevealState(nextReveal);
+
+                getPresenterHubConnection()
+                  .invoke("UpdateState", {
+                    screen: "question-detail",
+                    categoryId,
+                    questionId,
+                    revealState: nextReveal,
+                  })
+                  .catch(() => {
+                    /* hub not connected */
+                  });
+              }}
+              onBoxReveal={onBoxReveal}
+            />
+          )}
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
