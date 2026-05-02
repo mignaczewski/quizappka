@@ -99,4 +99,13 @@ describe('MirrorPage', () => {
 
     await waitFor(() => expect(screen.getByText(/2\+2/)).toBeInTheDocument());
   });
+
+  // T017 — US2: hub connection failure shows error alert
+  it('shows error alert when hub connection fails', async () => {
+    mockStart.mockRejectedValue(new Error('Connection refused'));
+    renderMirrorPage();
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+    expect(screen.getByText(/connection refused/i)).toBeInTheDocument();
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+  });
 });

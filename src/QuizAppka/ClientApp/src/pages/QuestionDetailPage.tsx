@@ -11,7 +11,7 @@ import {
 import { fetchPresenterCategory } from "../services/quizApi";
 import { usePresenterSession } from "../hooks/usePresenterSession";
 import { getPresenterHubConnection } from "../services/presenterHub";
-import type { CategoryDetail, Question, RevealState, SingingPianosQuestion } from "../types/quiz";
+import type { CategoryDetail, Question, RevealState, RevealedBox, SingingPianosQuestion } from "../types/quiz";
 import QuestionDisplay from "../components/QuestionDisplay";
 
 export default function QuestionDetailPage() {
@@ -32,7 +32,11 @@ export default function QuestionDetailPage() {
   const [revealState, setRevealState] = useState<RevealState | null>(null);
 
   useEffect(() => {
-    if (!categoryId) return;
+    if (!categoryId) {
+      setError("Missing category ID");
+      setLoading(false);
+      return;
+    }
     fetchPresenterCategory(categoryId)
       .then((data) => {
         setCategory(data);
@@ -51,39 +55,52 @@ export default function QuestionDetailPage() {
       });
   }, [categoryId, questionId]);
 
-  const handleBack = () => {
-    navigate(`/quiz/${categoryId}`);
-  };
+  // T012 — dedicated effect broadcasts revealState to hub (not inside state updater)
+  useEffect(() => {
+    if (!revealState || !categoryId || !questionId) return;
+    getPresenterHubConnection()
+      .invoke("UpdateState", {
+        screen: "question-detail",
+        categoryId,
+        questionId,
+        revealState,
+      })
+      .catch(() => {
+        /* hub not connected */
+      });
+  }, [revealState, categoryId, questionId]);
 
+  const handleBack = useCallback(() => {
+    navigate(`/quiz/${categoryId}`);
+  }, [navigate, categoryId]);
+
+  // T011 — fix stale closure: use currentReveal from updater arg, not captured revealState
   const onBoxReveal = useCallback(
-    (index: number) => {
-      
-      setRevealState(currentReveal => {
-        const currentBoxes = currentReveal?.singingPianosBoxesRevealed ?? (question as SingingPianosQuestion)?.boxes.map(() => false) ?? [];
-        const nextBoxes = [...currentBoxes];
-        nextBoxes[index] = true;
-        const nextReveal: RevealState = {
-          ...revealState,
+    (id: string) => {
+      setRevealState((currentReveal) => {
+        const pianoQuestion = question as SingingPianosQuestion | null;
+        const currentBoxes: RevealedBox[] =
+          currentReveal?.singingPianosBoxesRevealed ??
+          (pianoQuestion?.boxes.map((b) => ({ id: b.id, revealed: false })) ?? []);
+        const nextBoxes = currentBoxes.map((b) =>
+          b.id === id ? { ...b, revealed: true } : b,
+        );
+        return {
+          ...currentReveal,
           singingPianosBoxesRevealed: nextBoxes,
         };
-
-        getPresenterHubConnection()
-        .invoke("UpdateState", {
-          screen: "question-detail",
-          categoryId,
-          questionId,
-          revealState: nextReveal,
-        })
-        .catch(() => {
-          /* hub not connected */
-        });
-        
-        return nextReveal;
       });
-      
     },
-    [categoryId, questionId, revealState, question],
+    [question],
   );
+
+  // T013 — fix onReveal to use functional updater (no stale closure)
+  const onReveal = useCallback(() => {
+    setRevealState((current) => ({
+      ...current,
+      memeImageRevealed: true,
+    }));
+  }, []);
 
   if (loading) {
     return (
@@ -151,24 +168,7 @@ export default function QuestionDetailPage() {
         <QuestionDisplay
           question={question}
           revealState={revealState}
-          onReveal={() => {
-            const nextReveal: RevealState = {
-              ...revealState,
-              memeImageRevealed: true,
-            };
-            setRevealState(nextReveal);
-            
-            getPresenterHubConnection()
-              .invoke("UpdateState", {
-                screen: "question-detail",
-                categoryId,
-                questionId,
-                revealState: nextReveal,
-              })
-              .catch(() => {
-                /* hub not connected */
-              });
-          }}
+          onReveal={onReveal}
           onBoxReveal={onBoxReveal}
         />
       )}

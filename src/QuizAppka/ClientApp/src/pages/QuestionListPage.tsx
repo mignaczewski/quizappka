@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Alert, Button, CircularProgress, Container, Typography } from '@mui/material';
 import { fetchCategory } from '../services/quizApi';
@@ -15,7 +15,11 @@ export default function QuestionListPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!categoryId) return;
+    if (!categoryId) {
+      setError('Missing category ID');
+      setLoading(false);
+      return;
+    }
     fetchCategory(categoryId)
       .then((data) => {
         setCategory(data);
@@ -26,6 +30,13 @@ export default function QuestionListPage() {
         setLoading(false);
       });
   }, [categoryId]);
+
+  const handleSelectQuestion = useCallback(
+    (questionId: string) => {
+      navigate(`/quiz/${categoryId}/${questionId}`);
+    },
+    [navigate, categoryId],
+  );
 
   if (loading) {
     return (
@@ -42,10 +53,6 @@ export default function QuestionListPage() {
       </Container>
     );
   }
-
-  const handleSelectQuestion = (questionId: string) => {
-    navigate(`/quiz/${categoryId}/${questionId}`);
-  };
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>

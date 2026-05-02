@@ -1,10 +1,10 @@
 import { Box, Button, Typography } from '@mui/material';
-import type { SingingPianosQuestion as SingingPianosQuestionType } from '../types/quiz';
+import type { SingingPianosQuestion as SingingPianosQuestionType, RevealedBox } from '../types/quiz';
 
 interface Props {
   question: SingingPianosQuestionType;
-  revealedBoxes?: boolean[] | null;
-  onBoxReveal?: (index: number) => void;
+  revealedBoxes?: RevealedBox[] | null;
+  onBoxReveal?: (id: string) => void;
 }
 
 export default function SingingPianos({ question, revealedBoxes, onBoxReveal }: Props) {
@@ -20,13 +20,13 @@ export default function SingingPianos({ question, revealedBoxes, onBoxReveal }: 
         }}
       >
         {question.boxes.map((box, index) => {
-          const isRevealed = revealedBoxes?.[index] === true;
+          const isRevealed = revealedBoxes?.find((r) => r.id === box.id)?.revealed === true;
           return (
             <Button
               key={box.id}
               variant={isRevealed ? 'contained' : 'outlined'}
-              onClick={() => !isRevealed && onBoxReveal?.(index)}
-              disabled={isRevealed && !onBoxReveal}
+              onClick={() => !isRevealed && onBoxReveal?.(box.id)}
+              disabled={isRevealed}
               data-testid={`piano-box-${index}`}
               sx={{ minWidth: 80, minHeight: 80, fontSize: '1.25rem' }}
             >

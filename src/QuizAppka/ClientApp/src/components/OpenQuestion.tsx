@@ -1,12 +1,9 @@
 import { Link, Typography } from '@mui/material';
 import type { OpenQuestion as OpenQuestionType } from '../types/quiz';
+import { isUrl } from '../utils/url';
 
 interface Props {
   question: OpenQuestionType;
-}
-
-function isUrl(value: string): boolean {
-  return value.startsWith('https://') || value.startsWith('http://');
 }
 
 export default function OpenQuestion({ question }: Props) {

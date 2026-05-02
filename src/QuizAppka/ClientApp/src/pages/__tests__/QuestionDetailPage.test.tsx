@@ -8,6 +8,11 @@ import type { CategoryDetail } from '../../types/quiz';
 
 vi.mock('../../services/quizApi');
 vi.mock('../../hooks/usePresenterSession');
+vi.mock('../../services/presenterHub', () => ({
+  getPresenterHubConnection: () => ({
+    invoke: vi.fn(() => Promise.resolve()),
+  }),
+}));
 
 const mockCategory: CategoryDetail = {
   id: 'science',
@@ -24,6 +29,16 @@ const mockCategory: CategoryDetail = {
       ],
     },
     { id: 'q3', type: 'image-rebus', prompt: 'Name this element', imageRef: 'carbon.png' },
+    {
+      id: 'q5',
+      type: 'singing-pianos',
+      prompt: 'Press the boxes!',
+      boxes: [
+        { id: 'box1', hiddenText: 'DO' },
+        { id: 'box2', hiddenText: 'RE' },
+        { id: 'box3', hiddenText: 'MI' },
+      ],
+    },
   ],
 };
 
@@ -135,6 +150,36 @@ describe('QuestionDetailPage', () => {
       expect(screen.getByRole('button', { name: 'Back to categories' })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Back to questions' })).toBeInTheDocument();
     });
+  });
+
+  // T009 — stale-closure fix: second box reveal accumulates correctly
+  it('reveals second piano box without losing first box reveal', async () => {
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
+    renderPage('science', 'q5');
+    await waitFor(() => expect(screen.getByText('Press the boxes!')).toBeInTheDocument());
+
+    // Click box 0 first
+    await userEvent.click(screen.getByTestId('piano-box-0'));
+    // Now click box 1
+    await userEvent.click(screen.getByTestId('piano-box-1'));
+
+    // Both boxes should be revealed (no stale closure overwriting)
+    expect(screen.getByTestId('piano-box-0')).toHaveTextContent('DO');
+    expect(screen.getByTestId('piano-box-1')).toHaveTextContent('RE');
+    expect(screen.getByTestId('piano-box-2')).toHaveTextContent('?');
+  });
+
+  // T016 — US2: missing categoryId shows error, not spinner
+  it('shows error alert when categoryId param is absent', async () => {
+    render(
+      <MemoryRouter initialEntries={['/detail']}>
+        <Routes>
+          <Route path="/detail" element={<QuestionDetailPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   });
 });
 

@@ -88,7 +88,14 @@ public class QuestionSerializationTests
     [Fact]
     public void RevealState_SerializesAndDeserializesCorrectly()
     {
-        var state = new RevealState(MemeImageRevealed: true, SingingPianosBoxesRevealed: [true, false, true]);
+        var state = new RevealState(
+            MemeImageRevealed: true,
+            SingingPianosBoxesRevealed:
+            [
+                new RevealedBox("box1", true),
+                new RevealedBox("box2", false),
+                new RevealedBox("box3", true),
+            ]);
 
         var json = JsonSerializer.Serialize(state, Options);
         var deserialized = JsonSerializer.Deserialize<RevealState>(json, Options);
@@ -96,8 +103,10 @@ public class QuestionSerializationTests
         Assert.NotNull(deserialized);
         Assert.True(deserialized.MemeImageRevealed);
         Assert.Equal(3, deserialized.SingingPianosBoxesRevealed!.Length);
-        Assert.True(deserialized.SingingPianosBoxesRevealed[0]);
-        Assert.False(deserialized.SingingPianosBoxesRevealed[1]);
+        Assert.Equal("box1", deserialized.SingingPianosBoxesRevealed[0].Id);
+        Assert.True(deserialized.SingingPianosBoxesRevealed[0].Revealed);
+        Assert.Equal("box2", deserialized.SingingPianosBoxesRevealed[1].Id);
+        Assert.False(deserialized.SingingPianosBoxesRevealed[1].Revealed);
     }
 
     [Fact]

@@ -47,6 +47,9 @@ export default function QuestionList({ questions, onSelectQuestion }: QuestionLi
             variant="outlined"
             sx={{ minWidth: 90 }}
           />
+          {question.validationError && (
+            <Chip label="Invalid" color="error" size="small" />
+          )}
           <ListItemText
             primary={question.prompt}
             slotProps={{

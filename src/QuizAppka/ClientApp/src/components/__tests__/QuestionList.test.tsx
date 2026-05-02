@@ -66,4 +66,22 @@ describe('QuestionList', () => {
     expect(screen.getAllByRole('button')).toHaveLength(1);
     expect(onSelect).not.toHaveBeenCalled();
   });
+
+  // T027 — US5: question with validationError shows error indicator
+  it('renders an error indicator for a question with validationError set', () => {
+    const invalidQuestion: Question = {
+      id: 'q_invalid',
+      type: 'singing-pianos',
+      prompt: 'No boxes here',
+      validationError: 'No boxes defined',
+      boxes: [],
+    };
+    render(<QuestionList questions={[invalidQuestion]} onSelectQuestion={vi.fn()} />);
+    expect(screen.getByText('Invalid')).toBeInTheDocument();
+  });
+
+  it('does not render error indicator for questions without validationError', () => {
+    render(<QuestionList questions={[questions[0]]} onSelectQuestion={vi.fn()} />);
+    expect(screen.queryByText('Invalid')).not.toBeInTheDocument();
+  });
 });

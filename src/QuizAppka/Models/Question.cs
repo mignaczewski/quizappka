@@ -12,4 +12,5 @@ public abstract class Question
 {
     public string Id { get; init; } = string.Empty;
     public string Prompt { get; init; } = string.Empty;
+    public string? ValidationError { get; set; }
 }

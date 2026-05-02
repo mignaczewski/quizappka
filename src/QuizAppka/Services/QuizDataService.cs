@@ -124,6 +124,24 @@ public class QuizDataService : IQuizDataService
                 continue;
             }
 
+            // T029 — US5: SingingPianos with no boxes included with ValidationError
+            if (question is SingingPianosQuestion piano && piano.Boxes.Length == 0)
+            {
+                logger.LogWarning(
+                    "Singing-pianos question '{QuestionId}' in category '{CategoryId}' has no boxes; including with validation error",
+                    question.Id, categoryId);
+                piano.ValidationError = "No boxes defined";
+            }
+
+            // T030 — US5: Meme with empty EntryImage included with ValidationError
+            if (question is MemeQuestion meme && string.IsNullOrWhiteSpace(meme.EntryImage))
+            {
+                logger.LogWarning(
+                    "Meme question '{QuestionId}' in category '{CategoryId}' has empty entryImage; including with validation error",
+                    question.Id, categoryId);
+                meme.ValidationError = "Missing entry image";
+            }
+
             valid.Add(question);
         }
 

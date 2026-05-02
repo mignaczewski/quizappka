@@ -1,12 +1,9 @@
 import { Link, List, ListItem, ListItemText, Typography } from '@mui/material';
 import type { ClosedQuestion as ClosedQuestionType } from '../types/quiz';
+import { isUrl } from '../utils/url';
 
 interface Props {
   question: ClosedQuestionType;
-}
-
-function isUrl(value: string): boolean {
-  return value.startsWith('https://') || value.startsWith('http://');
 }
 
 export default function ClosedQuestion({ question }: Props) {

@@ -110,4 +110,17 @@ describe('QuestionListPage', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Back to categories' }));
     expect(screen.getByTestId('category-list')).toBeInTheDocument();
   });
+
+  // T015 — US2: missing categoryId shows error, not spinner
+  it('shows error alert when categoryId param is absent', async () => {
+    render(
+      <MemoryRouter initialEntries={['/quiz/']}>
+        <Routes>
+          <Route path="/quiz/" element={<QuestionListPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+  });
 });

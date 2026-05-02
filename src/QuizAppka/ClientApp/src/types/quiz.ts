@@ -3,10 +3,16 @@ export interface AnswerOption {
   text: string;
 }
 
+export interface RevealedBox {
+  id: string;
+  revealed: boolean;
+}
+
 export interface BaseQuestion {
   id: string;
   type: string;
   prompt: string;
+  validationError?: string | null;
 }
 
 export interface OpenQuestion extends BaseQuestion {
@@ -44,7 +50,7 @@ export interface SingingPianosQuestion extends BaseQuestion {
 
 export interface RevealState {
   memeImageRevealed?: boolean | null;
-  singingPianosBoxesRevealed?: boolean[] | null;
+  singingPianosBoxesRevealed?: RevealedBox[] | null;
 }
 
 export type Question = OpenQuestion | ClosedQuestion | ImageRebusQuestion | MemeQuestion | SingingPianosQuestion;

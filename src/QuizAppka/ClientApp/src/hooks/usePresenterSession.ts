@@ -8,6 +8,10 @@ export function usePresenterSession(state: PresenterScreen): void {
   const questionId = 'questionId' in state ? state.questionId : null;
 
   useEffect(() => {
+    // Guard: do not broadcast when required identifiers are empty strings
+    if (categoryId === '') return;
+    if (questionId === '') return;
+
     const connection = getPresenterHubConnection();
 
     startPresenterHub()

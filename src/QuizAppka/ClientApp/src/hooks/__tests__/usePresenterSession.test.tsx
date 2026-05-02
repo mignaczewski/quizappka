@@ -75,4 +75,24 @@ describe('usePresenterSession', () => {
     expect(calls).toContain('cat1');
     expect(calls).toContain('cat2');
   });
+
+  // T022 — US3: empty categoryId must not trigger an UpdateState invoke
+  it('does not invoke UpdateState when categoryId is an empty string', async () => {
+    await act(async () => {
+      renderInRouter(<TestWithCategoryId categoryId="" />);
+    });
+
+    const updateStateCalls = mockInvoke.mock.calls.filter((c: unknown[]) => c[0] === 'UpdateState');
+    expect(updateStateCalls).toHaveLength(0);
+  });
+
+  it('invokes UpdateState for valid non-empty categoryId', async () => {
+    await act(async () => {
+      renderInRouter(<TestWithCategoryId categoryId="science" />);
+    });
+
+    expect(mockInvoke).toHaveBeenCalledWith('UpdateState', expect.objectContaining({
+      categoryId: 'science',
+    }));
+  });
 });

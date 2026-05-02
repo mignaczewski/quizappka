@@ -128,4 +128,38 @@ public class QuizDataServiceTests : IDisposable
 
         Assert.Null(cat);
     }
+
+    // T026 — US5: SingingPianos with empty Boxes is included with ValidationError
+    [Fact]
+    public void GetCategories_IncludesSingingPianosWithEmptyBoxes_WithValidationError()
+    {
+        const string questionsJson = "[{\"id\":\"q1\",\"type\":\"singing-pianos\",\"prompt\":\"Piano?\",\"boxes\":[]},{\"id\":\"q2\",\"type\":\"open\",\"prompt\":\"Valid?\"}]";
+        WriteCategory("cat1", "Cat", questionsJson);
+
+        var svc = CreateService();
+        var cats = svc.GetCategories();
+
+        Assert.Single(cats);
+        Assert.Equal(2, cats[0].Questions.Count);
+        var piano = cats[0].Questions.Single(q => q.Id == "q1");
+        Assert.NotNull(piano.ValidationError);
+        Assert.Equal("No boxes defined", piano.ValidationError);
+    }
+
+    // T026 — US5: Meme with empty EntryImage is included with ValidationError
+    [Fact]
+    public void GetCategories_IncludesMemeWithEmptyEntryImage_WithValidationError()
+    {
+        const string questionsJson = "[{\"id\":\"q1\",\"type\":\"meme\",\"prompt\":\"Meme?\",\"entryImage\":\"\",\"revealImage\":\"reveal.jpg\",\"options\":[]},{\"id\":\"q2\",\"type\":\"open\",\"prompt\":\"Valid?\"}]";
+        WriteCategory("cat1", "Cat", questionsJson);
+
+        var svc = CreateService();
+        var cats = svc.GetCategories();
+
+        Assert.Single(cats);
+        Assert.Equal(2, cats[0].Questions.Count);
+        var meme = cats[0].Questions.Single(q => q.Id == "q1");
+        Assert.NotNull(meme.ValidationError);
+        Assert.Equal("Missing entry image", meme.ValidationError);
+    }
 }

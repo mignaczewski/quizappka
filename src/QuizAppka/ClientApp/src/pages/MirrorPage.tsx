@@ -30,6 +30,7 @@ export default function MirrorPage() {
   const [revealState, setRevealState] = useState<RevealState | null>(null);
   const [connected, setConnected] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const connection = getPresenterHubConnection();
@@ -59,7 +60,11 @@ export default function MirrorPage() {
     connection.onreconnecting(() => setReconnecting(true));
     connection.onreconnected(() => setReconnecting(false));
 
-    startPresenterHub().then(() => setConnected(true)).catch(() => {});
+    startPresenterHub()
+      .then(() => setConnected(true))
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : 'Failed to connect to presenter hub');
+      });
 
     return () => {
       connection.off('StateUpdated');
@@ -94,6 +99,16 @@ export default function MirrorPage() {
       setQuestion(null);
     }
   }, [mirrorScreen]);
+
+  if (error) {
+    return (
+      <Container sx={{ mt: 4 }}>
+        <Alert severity="error" role="alert">
+          {error}
+        </Alert>
+      </Container>
+    );
+  }
 
   if (!connected) {
     return (
