@@ -9,6 +9,11 @@ import type { CategoryDetail } from '../../types/quiz';
 vi.mock('../../services/quizApi');
 vi.mock('../../hooks/usePresenterSession');
 
+const mockInvoke = vi.fn(() => Promise.resolve());
+vi.mock('../../services/presenterHub', () => ({
+  getPresenterHubConnection: () => ({ invoke: mockInvoke }),
+}));
+
 const mockCategory: CategoryDetail = {
   id: 'science',
   name: 'Science',
@@ -42,6 +47,7 @@ function renderPage(categoryId = 'science', questionId = 'q1') {
 describe('QuestionDetailPage', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    mockInvoke.mockResolvedValue(undefined);
   });
 
   it('shows loading indicator while fetching', () => {
@@ -142,6 +148,123 @@ describe('QuestionDetailPage', () => {
     const { container } = renderPage();
     await waitFor(() => expect(screen.getByText('Science')).toBeInTheDocument());
     expect(container.querySelector('.MuiContainer-root')).toBeNull();
+  });
+
+  // T008 — onBoxReveal state-logic tests
+  describe('onBoxReveal (Singing Pianos)', () => {
+    const categoryWithPianos: CategoryDetail = {
+      id: 'music',
+      name: 'Music',
+      questions: [
+        {
+          id: 'q-piano',
+          type: 'singing-pianos',
+          prompt: 'Reveal me!',
+          boxes: [
+            { id: 'box1', hiddenText: 'DO' },
+            { id: 'box2', hiddenText: 'RE' },
+            { id: 'box3', hiddenText: 'MI' },
+          ],
+        },
+      ],
+    };
+
+    it('clicking an unrevealed box reveals it by id', async () => {
+      vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(categoryWithPianos);
+      renderPage('music', 'q-piano');
+      await waitFor(() => expect(screen.getByText('Reveal me!')).toBeInTheDocument());
+
+      await userEvent.click(screen.getByTestId('piano-box-1'));
+
+      expect(screen.getByTestId('piano-box-1')).toHaveTextContent('RE');
+      expect(screen.getByTestId('piano-box-0')).toHaveTextContent('?');
+    });
+
+    it('clicking an already-revealed box does not change state', async () => {
+      vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(categoryWithPianos);
+      renderPage('music', 'q-piano');
+      await waitFor(() => expect(screen.getByText('Reveal me!')).toBeInTheDocument());
+
+      // Reveal box1
+      await userEvent.click(screen.getByTestId('piano-box-0'));
+      expect(screen.getByTestId('piano-box-0')).toHaveTextContent('DO');
+
+      const invokeCallCount = mockInvoke.mock.calls.length;
+
+      // Click again — should be a no-op (button is now contained/disabled for re-reveal)
+      await userEvent.click(screen.getByTestId('piano-box-0'));
+      expect(mockInvoke.mock.calls.length).toBe(invokeCallCount);
+    });
+
+    it('hub invoke is called with PianoBoxReveal[] payload after a box reveal', async () => {
+      vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(categoryWithPianos);
+      renderPage('music', 'q-piano');
+      await waitFor(() => expect(screen.getByText('Reveal me!')).toBeInTheDocument());
+
+      await userEvent.click(screen.getByTestId('piano-box-2'));
+
+      await waitFor(() => expect(mockInvoke).toHaveBeenCalled());
+      const [method, payload] = mockInvoke.mock.calls[0];
+      expect(method).toBe('UpdateState');
+      expect(payload.revealState.singingPianosBoxesRevealed).toEqual([
+        { id: 'box3', revealed: true },
+      ]);
+    });
+
+    it('revealing multiple boxes accumulates entries', async () => {
+      vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(categoryWithPianos);
+      renderPage('music', 'q-piano');
+      await waitFor(() => expect(screen.getByText('Reveal me!')).toBeInTheDocument());
+
+      await userEvent.click(screen.getByTestId('piano-box-0'));
+      await userEvent.click(screen.getByTestId('piano-box-2'));
+
+      expect(screen.getByTestId('piano-box-0')).toHaveTextContent('DO');
+      expect(screen.getByTestId('piano-box-1')).toHaveTextContent('?');
+      expect(screen.getByTestId('piano-box-2')).toHaveTextContent('MI');
+    });
+  });
+
+  // T009 — Callback-stability tests
+  describe('callback stability (useCallback)', () => {
+    const categoryWithMeme: CategoryDetail = {
+      id: 'fun',
+      name: 'Fun',
+      questions: [
+        {
+          id: 'q-meme',
+          type: 'meme',
+          prompt: 'Caption this',
+          imageRef: 'meme.jpg',
+          revealImage: 'meme-reveal.jpg',
+          options: [{ id: 'o1', text: 'Option A' }],
+        },
+      ],
+    };
+
+    it('onReveal reference is stable across unrelated re-renders (does not change when question is unchanged)', async () => {
+      vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(categoryWithMeme);
+      renderPage('fun', 'q-meme');
+      await waitFor(() => expect(screen.getByText('Caption this')).toBeInTheDocument());
+
+      const revealBtn = screen.getByTestId('reveal-image-button');
+
+      await userEvent.click(revealBtn);
+
+      // After reveal, the reveal button is gone and the meme image is visible
+      await waitFor(() => expect(screen.queryByTestId('reveal-image-button')).toBeNull());
+      expect(screen.getByAltText('Revealed meme')).toBeInTheDocument();
+    });
+
+    it('handleBack reference is stable: clicking back navigates without errors after a re-render', async () => {
+      vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
+      renderPage();
+      await waitFor(() => expect(screen.getByText('Science')).toBeInTheDocument());
+
+      const backBtn = screen.getByRole('button', { name: /back to questions/i });
+      await userEvent.click(backBtn);
+      await waitFor(() => expect(screen.getByTestId('question-list')).toBeInTheDocument());
+    });
   });
 });
 

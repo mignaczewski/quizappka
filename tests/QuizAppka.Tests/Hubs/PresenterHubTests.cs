@@ -152,7 +152,13 @@ public class PresenterHubTests : IClassFixture<WebApplicationFactory<Program>>
         await connection1.StartAsync();
         await connection2.StartAsync();
 
-        var revealState = new RevealState(SingingPianosBoxesRevealed: [true, false, false, false, false]);
+        var revealState = new RevealState(SingingPianosBoxesRevealed: [
+            new PianoBoxReveal("box1", true),
+            new PianoBoxReveal("box2", false),
+            new PianoBoxReveal("box3", false),
+            new PianoBoxReveal("box4", false),
+            new PianoBoxReveal("box5", false)
+        ]);
         await connection1.InvokeAsync("UpdateState",
             new PresenterStateDto("question-detail", "cat1", "q5", revealState));
 
@@ -162,8 +168,8 @@ public class PresenterHubTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.NotNull(received.RevealState);
         Assert.NotNull(received.RevealState.SingingPianosBoxesRevealed);
         Assert.Equal(5, received.RevealState.SingingPianosBoxesRevealed.Length);
-        Assert.True(received.RevealState.SingingPianosBoxesRevealed[0]);
-        Assert.False(received.RevealState.SingingPianosBoxesRevealed[1]);
+        Assert.True(received.RevealState.SingingPianosBoxesRevealed[0].Revealed);
+        Assert.False(received.RevealState.SingingPianosBoxesRevealed[1].Revealed);
 
         await connection1.DisposeAsync();
         await connection2.DisposeAsync();
@@ -174,7 +180,13 @@ public class PresenterHubTests : IClassFixture<WebApplicationFactory<Program>>
     {
         var sender = BuildConnection();
         await sender.StartAsync();
-        var revealState = new RevealState(SingingPianosBoxesRevealed: [true, false, true, false, false]);
+        var revealState = new RevealState(SingingPianosBoxesRevealed: [
+            new PianoBoxReveal("box1", true),
+            new PianoBoxReveal("box2", false),
+            new PianoBoxReveal("box3", true),
+            new PianoBoxReveal("box4", false),
+            new PianoBoxReveal("box5", false)
+        ]);
         await sender.InvokeAsync("UpdateState",
             new PresenterStateDto("question-detail", "cat1", "q5", revealState));
 
@@ -189,9 +201,9 @@ public class PresenterHubTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.NotNull(received.RevealState);
         var boxes = received.RevealState.SingingPianosBoxesRevealed;
         Assert.NotNull(boxes);
-        Assert.True(boxes[0]);
-        Assert.False(boxes[1]);
-        Assert.True(boxes[2]);
+        Assert.True(boxes[0].Revealed);
+        Assert.False(boxes[1].Revealed);
+        Assert.True(boxes[2].Revealed);
 
         await sender.DisposeAsync();
         await receiver.DisposeAsync();

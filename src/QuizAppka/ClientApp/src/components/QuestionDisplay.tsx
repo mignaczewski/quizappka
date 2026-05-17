@@ -10,7 +10,7 @@ interface Props {
   question: Question;
   revealState?: RevealState | null;
   onReveal?: () => void;
-  onBoxReveal?: (index: number) => void;
+  onBoxReveal?: (boxId: string) => void;
   displayMode?: DisplayMode;
 }
 

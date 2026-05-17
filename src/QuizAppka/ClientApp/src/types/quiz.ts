@@ -42,9 +42,14 @@ export interface SingingPianosQuestion extends BaseQuestion {
   boxes: PianoBox[];
 }
 
+export interface PianoBoxReveal {
+  id: string;
+  revealed: boolean;
+}
+
 export interface RevealState {
   memeImageRevealed?: boolean | null;
-  singingPianosBoxesRevealed?: boolean[] | null;
+  singingPianosBoxesRevealed?: PianoBoxReveal[] | null;
 }
 
 export type Question = OpenQuestion | ClosedQuestion | ImageRebusQuestion | MemeQuestion | SingingPianosQuestion;

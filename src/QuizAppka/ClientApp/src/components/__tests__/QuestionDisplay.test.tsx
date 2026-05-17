@@ -85,7 +85,7 @@ describe('QuestionDisplay', () => {
         { id: 'b2', hiddenText: 'RE' },
       ],
     };
-    const revealState: RevealState = { singingPianosBoxesRevealed: [true, false] };
+    const revealState: RevealState = { singingPianosBoxesRevealed: [{ id: 'b1', revealed: true }, { id: 'b2', revealed: false }] };
     render(<QuestionDisplay question={q} revealState={revealState} />);
     expect(screen.getByTestId('piano-box-0')).toHaveTextContent('DO');
     expect(screen.getByTestId('piano-box-1')).toHaveTextContent('?');

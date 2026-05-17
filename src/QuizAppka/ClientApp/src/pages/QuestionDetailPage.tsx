@@ -12,7 +12,7 @@ import Grid from "@mui/material/Grid";
 import { fetchPresenterCategory } from "../services/quizApi";
 import { usePresenterSession } from "../hooks/usePresenterSession";
 import { getPresenterHubConnection } from "../services/presenterHub";
-import type { CategoryDetail, Question, RevealState, SingingPianosQuestion } from "../types/quiz";
+import type { CategoryDetail, Question, RevealState } from "../types/quiz";
 import QuestionDisplay from "../components/QuestionDisplay";
 
 export default function QuestionDetailPage() {
@@ -52,38 +52,60 @@ export default function QuestionDetailPage() {
       });
   }, [categoryId, questionId]);
 
-  const handleBack = () => {
+  const onReveal = useCallback(() => {
+    const nextReveal: RevealState = {
+      ...revealState,
+      memeImageRevealed: true,
+    };
+    setRevealState(nextReveal);
+
+    getPresenterHubConnection()
+      .invoke("UpdateState", {
+        screen: "question-detail",
+        categoryId,
+        questionId,
+        revealState: nextReveal,
+      })
+      .catch(() => {
+        /* hub not connected */
+      });
+  }, [revealState, categoryId, questionId]);
+
+  const handleBack = useCallback(() => {
     navigate(`/quiz/${categoryId}`);
-  };
+  }, [categoryId, navigate]);
 
   const onBoxReveal = useCallback(
-    (index: number) => {
-      
+    (boxId: string) => {
       setRevealState(currentReveal => {
-        const currentBoxes = currentReveal?.singingPianosBoxesRevealed ?? (question as SingingPianosQuestion)?.boxes.map(() => false) ?? [];
-        const nextBoxes = [...currentBoxes];
-        nextBoxes[index] = true;
+        const currentBoxes = currentReveal?.singingPianosBoxesRevealed ?? [];
+        const alreadyRevealed = currentBoxes.find(r => r.id === boxId)?.revealed === true;
+        if (alreadyRevealed) return currentReveal;
+
+        const nextBoxes = currentBoxes.some(r => r.id === boxId)
+          ? currentBoxes.map(r => r.id === boxId ? { ...r, revealed: true } : r)
+          : [...currentBoxes, { id: boxId, revealed: true }];
+
         const nextReveal: RevealState = {
-          ...revealState,
+          ...currentReveal,
           singingPianosBoxesRevealed: nextBoxes,
         };
 
         getPresenterHubConnection()
-        .invoke("UpdateState", {
-          screen: "question-detail",
-          categoryId,
-          questionId,
-          revealState: nextReveal,
-        })
-        .catch(() => {
-          /* hub not connected */
-        });
-        
+          .invoke("UpdateState", {
+            screen: "question-detail",
+            categoryId,
+            questionId,
+            revealState: nextReveal,
+          })
+          .catch(() => {
+            /* hub not connected */
+          });
+
         return nextReveal;
       });
-      
     },
-    [categoryId, questionId, revealState, question],
+    [categoryId, questionId],
   );
 
   if (loading) {
@@ -159,24 +181,7 @@ export default function QuestionDetailPage() {
             <QuestionDisplay
               question={question}
               revealState={revealState}
-              onReveal={() => {
-                const nextReveal: RevealState = {
-                  ...revealState,
-                  memeImageRevealed: true,
-                };
-                setRevealState(nextReveal);
-
-                getPresenterHubConnection()
-                  .invoke("UpdateState", {
-                    screen: "question-detail",
-                    categoryId,
-                    questionId,
-                    revealState: nextReveal,
-                  })
-                  .catch(() => {
-                    /* hub not connected */
-                  });
-              }}
+              onReveal={onReveal}
               onBoxReveal={onBoxReveal}
             />
           )}

@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import SingingPianos from '../SingingPianos';
-import type { SingingPianosQuestion as SingingPianosQuestionType } from '../../types/quiz';
+import type { SingingPianosQuestion as SingingPianosQuestionType, PianoBoxReveal } from '../../types/quiz';
 
 const question: SingingPianosQuestionType = {
   id: 'q1',
@@ -31,25 +31,42 @@ describe('SingingPianos', () => {
     boxes.forEach((box) => expect(box).toHaveTextContent('?'));
   });
 
-  it('reveals text of a box when revealedBoxes[index] is true', () => {
-    render(<SingingPianos question={question} revealedBoxes={[true, false, false, false, false]} />);
+  it('reveals text of a box when its entry in revealedBoxes has revealed: true', () => {
+    const revealedBoxes: PianoBoxReveal[] = [{ id: 'box1', revealed: true }];
+    render(<SingingPianos question={question} revealedBoxes={revealedBoxes} />);
     expect(screen.getByTestId('piano-box-0')).toHaveTextContent('DO');
     expect(screen.getByTestId('piano-box-1')).toHaveTextContent('?');
   });
 
-  it('calls onBoxReveal with correct index when unrevealed box is clicked', async () => {
+  it('does not reveal a box whose entry has revealed: false', () => {
+    const revealedBoxes: PianoBoxReveal[] = [{ id: 'box1', revealed: false }];
+    render(<SingingPianos question={question} revealedBoxes={revealedBoxes} />);
+    expect(screen.getByTestId('piano-box-0')).toHaveTextContent('?');
+  });
+
+  it('reveals a non-first box by id regardless of array order', () => {
+    const revealedBoxes: PianoBoxReveal[] = [{ id: 'box3', revealed: true }];
+    render(<SingingPianos question={question} revealedBoxes={revealedBoxes} />);
+    expect(screen.getByTestId('piano-box-0')).toHaveTextContent('?');
+    expect(screen.getByTestId('piano-box-1')).toHaveTextContent('?');
+    expect(screen.getByTestId('piano-box-2')).toHaveTextContent('MI');
+    expect(screen.getByTestId('piano-box-3')).toHaveTextContent('?');
+  });
+
+  it('calls onBoxReveal with the box id when unrevealed box is clicked', async () => {
     const onBoxReveal = vi.fn();
     render(<SingingPianos question={question} onBoxReveal={onBoxReveal} />);
     await userEvent.click(screen.getByTestId('piano-box-2'));
-    expect(onBoxReveal).toHaveBeenCalledWith(2);
+    expect(onBoxReveal).toHaveBeenCalledWith('box3');
   });
 
   it('does not call onBoxReveal when already revealed box is clicked', async () => {
     const onBoxReveal = vi.fn();
+    const revealedBoxes: PianoBoxReveal[] = [{ id: 'box3', revealed: true }];
     render(
       <SingingPianos
         question={question}
-        revealedBoxes={[false, false, true, false, false]}
+        revealedBoxes={revealedBoxes}
         onBoxReveal={onBoxReveal}
       />
     );
