@@ -1,11 +1,11 @@
 import Grid from '@mui/material/Grid';
 import { Box, Button, Typography } from '@mui/material';
-import type { SingingPianosQuestion as SingingPianosQuestionType, DisplayMode } from '../types/quiz';
+import type { SingingPianosQuestion as SingingPianosQuestionType, PianoBoxReveal, DisplayMode } from '../types/quiz';
 
 interface Props {
   question: SingingPianosQuestionType;
-  revealedBoxes?: boolean[] | null;
-  onBoxReveal?: (index: number) => void;
+  revealedBoxes?: PianoBoxReveal[] | null;
+  onBoxReveal?: (boxId: string) => void;
   displayMode?: DisplayMode;
 }
 
@@ -17,13 +17,13 @@ export default function SingingPianos({ question, revealedBoxes, onBoxReveal, di
       <Box sx={{ mt: 2 }}>
         <Grid container columns={4} spacing={2}>
           {question.boxes.map((box, index) => {
-            const isRevealed = revealedBoxes?.[index] === true;
+            const isRevealed = revealedBoxes?.find(r => r.id === box.id)?.revealed === true;
             return (
               <Grid size={1} key={box.id}>
                 <Button
                   fullWidth
                   variant={isRevealed ? 'contained' : 'outlined'}
-                  onClick={() => !isRevealed && onBoxReveal?.(index)}
+                  onClick={() => !isRevealed && onBoxReveal?.(box.id)}
                   disabled={isRevealed && !onBoxReveal}
                   data-testid={`piano-box-${index}`}
                   sx={{
