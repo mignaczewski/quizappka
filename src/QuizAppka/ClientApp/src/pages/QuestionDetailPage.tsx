@@ -77,13 +77,16 @@ export default function QuestionDetailPage() {
 
   const onBoxReveal = useCallback(
     (boxId: string) => {
-      setRevealState(currentReveal => {
+      setRevealState((currentReveal) => {
         const currentBoxes = currentReveal?.singingPianosBoxesRevealed ?? [];
-        const alreadyRevealed = currentBoxes.find(r => r.id === boxId)?.revealed === true;
+        const alreadyRevealed =
+          currentBoxes.find((r) => r.id === boxId)?.revealed === true;
         if (alreadyRevealed) return currentReveal;
 
-        const nextBoxes = currentBoxes.some(r => r.id === boxId)
-          ? currentBoxes.map(r => r.id === boxId ? { ...r, revealed: true } : r)
+        const nextBoxes = currentBoxes.some((r) => r.id === boxId)
+          ? currentBoxes.map((r) =>
+              r.id === boxId ? { ...r, revealed: true } : r,
+            )
           : [...currentBoxes, { id: boxId, revealed: true }];
 
         const nextReveal: RevealState = {
@@ -108,54 +111,15 @@ export default function QuestionDetailPage() {
     [categoryId, questionId],
   );
 
-  if (loading) {
-    return (
-      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
-        <Grid container columns={12}>
-          <Grid size={10} offset={1} sx={{ display: "flex", justifyContent: "center" }}>
-            <CircularProgress role="progressbar" />
-          </Grid>
-        </Grid>
-      </Box>
-    );
-  }
-
-  if (error || !category) {
-    return (
-      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
-        <Grid container columns={12}>
-          <Grid size={10} offset={1}>
-            <Stack direction="row" spacing={2}>
-              <Button
-                variant="text"
-                onClick={() => navigate("/")}
-                sx={{ mb: 1 }}
-                aria-label="Back to categories"
-              >
-                ← Back to categories
-              </Button>
-              <Button
-                variant="text"
-                onClick={handleBack}
-                sx={{ mb: 2 }}
-                aria-label="Back to questions"
-              >
-                ← Back to questions
-              </Button>
-            </Stack>
-            <Alert severity="error" role="alert">
-              {error ?? "Category not found"}
-            </Alert>
-          </Grid>
-        </Grid>
-      </Box>
-    );
-  }
-
   return (
-    <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+    <Box data-testid="page-layout" sx={{ width: "100%", pt: 4 }}>
       <Grid container columns={12}>
-        <Grid size={10} offset={1}>
+        <Grid size={7} offset={1}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            {category?.name}
+          </Typography>
+        </Grid>
+        <Grid size={4}>
           <Stack direction="row" spacing={2}>
             <Button
               variant="text"
@@ -163,7 +127,7 @@ export default function QuestionDetailPage() {
               sx={{ mb: 1 }}
               aria-label="Back to categories"
             >
-              ← Back to categories
+              ← Powrót do listy kategorii
             </Button>
             <Button
               variant="text"
@@ -171,20 +135,31 @@ export default function QuestionDetailPage() {
               sx={{ mb: 2 }}
               aria-label="Back to questions"
             >
-              ← Back to questions
+              ← Powrót do listy pytań
             </Button>
           </Stack>
-          <Typography variant="h4" gutterBottom>
-            {category.name}
-          </Typography>
-          {question && (
-            <QuestionDisplay
-              question={question}
-              revealState={revealState}
-              onReveal={onReveal}
-              onBoxReveal={onBoxReveal}
-            />
+        </Grid>
+      </Grid>
+      <Grid container columns={12}>
+        <Grid size={10} offset={1}>
+          {!!category && (
+            <>
+              {question && (
+                <QuestionDisplay
+                  question={question}
+                  revealState={revealState}
+                  onReveal={onReveal}
+                  onBoxReveal={onBoxReveal}
+                />
+              )}
+            </>
           )}
+          {(error || !category) && (
+            <Alert severity="error" role="alert">
+              {error ?? "Category not found"}
+            </Alert>
+          )}
+          {loading && <CircularProgress role="progressbar" />}
         </Grid>
       </Grid>
     </Box>
