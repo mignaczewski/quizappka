@@ -26,7 +26,7 @@ test.describe('Mirroring — US2: Mirror follows presenter navigation', () => {
     await page.waitForURL(/\/quiz\/[^/]+$/, { timeout: 10000 });
 
     // Mirror should update to show question list (within 2 s)
-    await expect(mirror.locator('h4')).toBeVisible({ timeout: 5000 });
+    await expect(mirror.locator('h1')).toBeVisible({ timeout: 5000 });
 
     // Mirror must NOT have navigation controls (Back button, clickable list items that navigate)
     await expect(mirror.getByRole('button', { name: /back to questions/i })).not.toBeVisible();
@@ -36,7 +36,7 @@ test.describe('Mirroring — US2: Mirror follows presenter navigation', () => {
     await page.waitForURL(/\/quiz\/[^/]+\/[^/]+$/, { timeout: 10000 });
 
     // Mirror should update to show question detail
-    await expect(mirror.locator('h4')).toBeVisible({ timeout: 5000 });
+    await expect(mirror.locator('h2')).toBeVisible({ timeout: 5000 });
 
     // Mirror must NOT have a back button
     await expect(mirror.getByRole('button', { name: /back to questions/i })).not.toBeVisible();
@@ -71,9 +71,9 @@ test.describe('Mirroring — US3: Multiple simultaneous mirror views', () => {
     await page.waitForURL(/\/quiz\/[^/]+\/[^/]+$/, { timeout: 10000 });
 
     // All three mirrors should show the question — wait up to 3 s
-    await expect(mirror1.locator('h4')).toBeVisible({ timeout: 5000 });
-    await expect(mirror2.locator('h4')).toBeVisible({ timeout: 5000 });
-    await expect(mirror3.locator('h4')).toBeVisible({ timeout: 5000 });
+    await expect(mirror1.locator('h1')).toBeVisible({ timeout: 5000 });
+    await expect(mirror2.locator('h1')).toBeVisible({ timeout: 5000 });
+    await expect(mirror3.locator('h1')).toBeVisible({ timeout: 5000 });
 
     // Close one mirror
     await mirror3.close();
@@ -104,7 +104,7 @@ test.describe('Mirroring — US3: Multiple simultaneous mirror views', () => {
     const mirror = await openMirror(page);
 
     // Mirror should immediately receive current state via late-join delivery
-    await expect(mirror.locator('h4')).toBeVisible({ timeout: 5000 });
+    await expect(mirror.locator('h1')).toBeVisible({ timeout: 5000 });
 
     // Must NOT show idle/waiting state
     await expect(mirror.getByRole('status')).not.toBeVisible();

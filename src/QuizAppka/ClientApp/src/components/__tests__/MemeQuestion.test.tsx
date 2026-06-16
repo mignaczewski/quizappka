@@ -100,4 +100,36 @@ describe('MemeQuestion', () => {
       expect(screen.getByRole('heading', { level: 4, name: 'Option A' })).toBeInTheDocument();
     });
   });
+
+  describe('presenterHint', () => {
+    const questionWithHint: MemeQuestionType = {
+      ...question,
+      presenterHint: 'Scoring note for presenter.',
+    };
+    const questionWithUrlHint: MemeQuestionType = {
+      ...question,
+      presenterHint: 'https://example.com/source',
+    };
+
+    it('renders hint text in presenter mode (default)', () => {
+      render(<MemeQuestion question={questionWithHint} />);
+      expect(screen.getByTestId('presenter-hint')).toHaveTextContent('Scoring note for presenter.');
+    });
+
+    it('renders hint as a link when hint is a URL', () => {
+      render(<MemeQuestion question={questionWithUrlHint} />);
+      const link = screen.getByRole('link', { name: 'https://example.com/source' });
+      expect(link).toHaveAttribute('href', 'https://example.com/source');
+    });
+
+    it('does not render hint in mirror mode', () => {
+      render(<MemeQuestion question={questionWithHint} displayMode="mirror" />);
+      expect(screen.queryByTestId('presenter-hint')).not.toBeInTheDocument();
+    });
+
+    it('does not render hint block when presenterHint is undefined', () => {
+      render(<MemeQuestion question={question} />);
+      expect(screen.queryByTestId('presenter-hint')).not.toBeInTheDocument();
+    });
+  });
 });

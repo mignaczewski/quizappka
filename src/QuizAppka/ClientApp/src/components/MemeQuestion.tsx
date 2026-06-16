@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Button, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Link, Paper, Stack, Typography } from '@mui/material';
 import type { MemeQuestion as MemeQuestionType, DisplayMode } from '../types/quiz';
 
 interface Props {
@@ -7,6 +7,10 @@ interface Props {
   revealImage?: boolean | null;
   onReveal?: () => void;
   displayMode?: DisplayMode;
+}
+
+function isUrl(value: string): boolean {
+  return value.startsWith('https://') || value.startsWith('http://');
 }
 
 export default function MemeQuestion({ question, revealImage, onReveal, displayMode }: Props) {
@@ -79,6 +83,17 @@ export default function MemeQuestion({ question, revealImage, onReveal, displayM
           </Paper>
         ))}
       </Stack>
+      {!isMirror && question.presenterHint && (
+        <Typography variant="body2" color="text.secondary" data-testid="presenter-hint" sx={{ mt: 1 }}>
+          {isUrl(question.presenterHint) ? (
+            <Link href={question.presenterHint} target="_blank" rel="noopener noreferrer">
+              {question.presenterHint}
+            </Link>
+          ) : (
+            question.presenterHint
+          )}
+        </Typography>
+      )}
     </>
   );
 }

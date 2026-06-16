@@ -204,7 +204,8 @@ describe('QuestionDetailPage', () => {
       await userEvent.click(screen.getByTestId('piano-box-2'));
 
       await waitFor(() => expect(mockInvoke).toHaveBeenCalled());
-      const [method, payload] = mockInvoke.mock.calls[0];
+      const calls = mockInvoke.mock.calls as unknown as [string, { revealState: { singingPianosBoxesRevealed: { id: string; revealed: boolean }[] } }][];
+      const [method, payload] = calls[0]!;
       expect(method).toBe('UpdateState');
       expect(payload.revealState.singingPianosBoxesRevealed).toEqual([
         { id: 'box3', revealed: true },
@@ -235,7 +236,7 @@ describe('QuestionDetailPage', () => {
           id: 'q-meme',
           type: 'meme',
           prompt: 'Caption this',
-          imageRef: 'meme.jpg',
+          entryImage: 'meme.jpg',
           revealImage: 'meme-reveal.jpg',
           options: [{ id: 'o1', text: 'Option A' }],
         },

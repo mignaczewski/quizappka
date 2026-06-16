@@ -18,6 +18,25 @@ const questions: Question[] = [
   { id: 'q3', type: 'image-rebus', prompt: 'What does this image show?', imageRef: 'test.png' },
 ];
 
+const questionsWithTitles: Question[] = [
+  { id: 'q1', type: 'open', prompt: 'What is photosynthesis? Full long prompt text here.', title: 'Photosynthesis' },
+  {
+    id: 'q2',
+    type: 'meme',
+    prompt: 'Which meme?',
+    title: 'The Monday Meme',
+    entryImage: 'meme.jpg',
+    options: [],
+  },
+  {
+    id: 'q3',
+    type: 'singing-pianos',
+    prompt: 'Reveal the notes:',
+    title: 'Music Notes',
+    boxes: [],
+  },
+];
+
 describe('QuestionList', () => {
   it('renders all questions as list entries', () => {
     render(<QuestionList questions={questions} onSelectQuestion={vi.fn()} />);
@@ -65,5 +84,46 @@ describe('QuestionList', () => {
     render(<QuestionList questions={[questions[0]]} onSelectQuestion={onSelect} />);
     expect(screen.getAllByRole('button')).toHaveLength(1);
     expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  describe('title display', () => {
+    it('renders title when defined and does not render full prompt text', () => {
+      render(<QuestionList questions={questionsWithTitles} onSelectQuestion={vi.fn()} />);
+      expect(screen.getByText('Photosynthesis')).toBeInTheDocument();
+      expect(screen.queryByText(/What is photosynthesis\? Full long prompt text here\./)).not.toBeInTheDocument();
+    });
+
+    it('renders prompt as fallback when title is absent', () => {
+      render(<QuestionList questions={questions} onSelectQuestion={vi.fn()} />);
+      expect(screen.getByText(/What is photosynthesis/)).toBeInTheDocument();
+    });
+
+    it('renders type-label fallback when both title and prompt are empty', () => {
+      const noTextQuestions: Question[] = [
+        { id: 'q1', type: 'meme', prompt: '', entryImage: 'e.jpg', options: [] },
+        { id: 'q2', type: 'singing-pianos', prompt: '', boxes: [] },
+        { id: 'q3', type: 'image-rebus', prompt: '', imageRef: 'r.png' },
+      ];
+      render(<QuestionList questions={noTextQuestions} onSelectQuestion={vi.fn()} />);
+      expect(screen.getByText('Meme Question')).toBeInTheDocument();
+      expect(screen.getByText('Singing Pianos')).toBeInTheDocument();
+      expect(screen.getByText('Image Rebus')).toBeInTheDocument();
+    });
+
+    it('renders title text even when it is very long', () => {
+      const longTitleQuestion: Question[] = [
+        { id: 'q1', type: 'open', prompt: 'Prompt', title: 'A'.repeat(200) },
+      ];
+      render(<QuestionList questions={longTitleQuestion} onSelectQuestion={vi.fn()} />);
+      expect(screen.getByText('A'.repeat(200))).toBeInTheDocument();
+    });
+
+    it('falls back to prompt when title is an empty string', () => {
+      const emptyTitleQuestion: Question[] = [
+        { id: 'q1', type: 'open', prompt: 'Fallback prompt', title: '' },
+      ];
+      render(<QuestionList questions={emptyTitleQuestion} onSelectQuestion={vi.fn()} />);
+      expect(screen.getByText('Fallback prompt')).toBeInTheDocument();
+    });
   });
 });

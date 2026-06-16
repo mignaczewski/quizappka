@@ -239,6 +239,302 @@ public class QuizControllerTests : IClassFixture<WebApplicationFactory<Program>>
         var json = await response.Content.ReadAsStringAsync();
         Assert.Contains("Secret open hint", json, StringComparison.OrdinalIgnoreCase);
     }
+
+    [Fact]
+    public async Task GetCategory_PublicEndpoint_StripsPresenterHintFromMemeQuestion()
+    {
+        var fakeService = new FakeQuizDataService(
+        [
+            new QuizCategory
+            {
+                Id = "cat1",
+                Name = "Cat 1",
+                Questions =
+                [
+                    new MemeQuestion
+                    {
+                        Id = "q1",
+                        Prompt = "Which meme?",
+                        EntryImage = "entry.jpg",
+                        Options = [],
+                        PresenterHint = "Meme secret hint",
+                    },
+                ],
+            },
+        ]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/categories/cat1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("Meme secret hint", json, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("presenterHint", json, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task GetCategory_PublicEndpoint_MemeQuestion_WithHint_PreservesTitle()
+    {
+        var fakeService = new FakeQuizDataService(
+        [
+            new QuizCategory
+            {
+                Id = "cat1",
+                Name = "Cat 1",
+                Questions =
+                [
+                    new MemeQuestion
+                    {
+                        Id = "q1",
+                        Prompt = "Which meme?",
+                        Title = "Monday Meme",
+                        EntryImage = "entry.jpg",
+                        Options = [],
+                        PresenterHint = "Meme secret hint",
+                    },
+                ],
+            },
+        ]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/categories/cat1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Monday Meme", json, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("presenterHint", json, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task GetCategory_PublicEndpoint_MemeQuestion_WithoutHint_PassesThroughUnchanged()
+    {
+        var fakeService = new FakeQuizDataService(
+        [
+            new QuizCategory
+            {
+                Id = "cat1",
+                Name = "Cat 1",
+                Questions =
+                [
+                    new MemeQuestion
+                    {
+                        Id = "q1",
+                        Prompt = "Which meme?",
+                        Title = "Monday Meme",
+                        EntryImage = "entry.jpg",
+                        Options = [],
+                    },
+                ],
+            },
+        ]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/categories/cat1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Monday Meme", json, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("entry.jpg", json, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task GetPresenterCategory_IncludesPresenterHintInMemeQuestion()
+    {
+        var fakeService = new FakeQuizDataService(
+        [
+            new QuizCategory
+            {
+                Id = "cat1",
+                Name = "Cat 1",
+                Questions =
+                [
+                    new MemeQuestion
+                    {
+                        Id = "q1",
+                        Prompt = "Which meme?",
+                        EntryImage = "entry.jpg",
+                        Options = [],
+                        PresenterHint = "Meme secret hint",
+                    },
+                ],
+            },
+        ]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/presenter/categories/cat1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Meme secret hint", json, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task GetCategory_PublicEndpoint_StripsPresenterHintFromSingingPianos()
+    {
+        var fakeService = new FakeQuizDataService(
+        [
+            new QuizCategory
+            {
+                Id = "cat1",
+                Name = "Cat 1",
+                Questions =
+                [
+                    new SingingPianosQuestion
+                    {
+                        Id = "q1",
+                        Prompt = "Reveal!",
+                        Boxes = [],
+                        PresenterHint = "Pianos secret hint",
+                    },
+                ],
+            },
+        ]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/categories/cat1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("Pianos secret hint", json, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("presenterHint", json, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task GetCategory_PublicEndpoint_SingingPianos_WithHint_PreservesTitle()
+    {
+        var fakeService = new FakeQuizDataService(
+        [
+            new QuizCategory
+            {
+                Id = "cat1",
+                Name = "Cat 1",
+                Questions =
+                [
+                    new SingingPianosQuestion
+                    {
+                        Id = "q1",
+                        Prompt = "Reveal!",
+                        Title = "Solfège Notes",
+                        Boxes = [],
+                        PresenterHint = "Pianos secret hint",
+                    },
+                ],
+            },
+        ]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/categories/cat1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Solfège Notes", json, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("presenterHint", json, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task GetPresenterCategory_IncludesPresenterHintInSingingPianos()
+    {
+        var fakeService = new FakeQuizDataService(
+        [
+            new QuizCategory
+            {
+                Id = "cat1",
+                Name = "Cat 1",
+                Questions =
+                [
+                    new SingingPianosQuestion
+                    {
+                        Id = "q1",
+                        Prompt = "Reveal!",
+                        Boxes = [],
+                        PresenterHint = "Pianos secret hint",
+                    },
+                ],
+            },
+        ]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/presenter/categories/cat1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Pianos secret hint", json, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task GetCategory_PublicEndpoint_ClosedQuestion_WithTitleAndHint_PreservesTitle()
+    {
+        var fakeService = new FakeQuizDataService(
+        [
+            new QuizCategory
+            {
+                Id = "cat1",
+                Name = "Cat 1",
+                Questions =
+                [
+                    new ClosedQuestion
+                    {
+                        Id = "q1",
+                        Prompt = "Question?",
+                        Title = "Closest Planet",
+                        Options = [],
+                        PresenterHint = "Secret",
+                    },
+                ],
+            },
+        ]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/categories/cat1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Closest Planet", json, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("presenterHint", json, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task GetCategory_PublicEndpoint_OpenQuestion_WithTitleAndHint_PreservesTitle()
+    {
+        var fakeService = new FakeQuizDataService(
+        [
+            new QuizCategory
+            {
+                Id = "cat1",
+                Name = "Cat 1",
+                Questions =
+                [
+                    new OpenQuestion { Id = "q1", Prompt = "Question?", Title = "Capital of France", PresenterHint = "Secret" },
+                ],
+            },
+        ]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/categories/cat1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Capital of France", json, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("presenterHint", json, StringComparison.OrdinalIgnoreCase);
+    }
 }
 
 file class FakeQuizDataService : IQuizDataService

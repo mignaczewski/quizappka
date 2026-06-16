@@ -1,11 +1,16 @@
 import Grid from "@mui/material/Grid";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Link, Typography } from "@mui/material";
 import type {
   SingingPianosQuestion as SingingPianosQuestionType,
+  PianoBox,
   PianoBoxReveal,
   DisplayMode,
 } from "../types/quiz";
 import { memo } from "react";
+
+function isUrl(value: string): boolean {
+  return value.startsWith("https://") || value.startsWith("http://");
+}
 
 interface Props {
   question: SingingPianosQuestionType;
@@ -54,6 +59,17 @@ export default function SingingPianos({
           </Box>
         </Grid>
       </Box>
+      {!isMirror && question.presenterHint && (
+        <Typography variant="body2" color="text.secondary" data-testid="presenter-hint" sx={{ mt: 2 }}>
+          {isUrl(question.presenterHint) ? (
+            <Link href={question.presenterHint} target="_blank" rel="noopener noreferrer">
+              {question.presenterHint}
+            </Link>
+          ) : (
+            question.presenterHint
+          )}
+        </Typography>
+      )}
     </>
   );
 }
@@ -61,7 +77,7 @@ export default function SingingPianos({
 const SingingPianoTile: React.FC<{
   isRevealed: boolean;
   onBoxReveal?: (boxId: string) => void;
-  box: any;
+  box: PianoBox;
   index: number;
   isMirror: boolean;
 }> = memo(({ isRevealed, onBoxReveal, box, index, isMirror }) => {

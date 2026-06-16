@@ -40,8 +40,8 @@ const CategoryListItem: React.FC<{
   const navigate = useNavigate();
 
   const onSelectCategory = useCallback(() => {
-    !isMirror && navigate(`/quiz/${category.id}`);
-  }, [navigate, category.id]);
+    if (!isMirror) navigate(`/quiz/${category.id}`);
+  }, [navigate, category.id, isMirror]);
 
   return (
     <>

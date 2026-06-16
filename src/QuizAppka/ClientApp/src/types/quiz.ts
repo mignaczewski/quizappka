@@ -7,6 +7,7 @@ export interface BaseQuestion {
   id: string;
   type: string;
   prompt: string;
+  title?: string;
 }
 
 export interface OpenQuestion extends BaseQuestion {
@@ -30,6 +31,7 @@ export interface MemeQuestion extends BaseQuestion {
   entryImage: string;
   revealImage?: string;
   options: AnswerOption[];
+  presenterHint?: string;
 }
 
 export interface PianoBox {
@@ -40,6 +42,7 @@ export interface PianoBox {
 export interface SingingPianosQuestion extends BaseQuestion {
   type: 'singing-pianos';
   boxes: PianoBox[];
+  presenterHint?: string;
 }
 
 export interface PianoBoxReveal {

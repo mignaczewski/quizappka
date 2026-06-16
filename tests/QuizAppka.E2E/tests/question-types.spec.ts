@@ -14,6 +14,7 @@ async function openMirror(presenterPage: Page): Promise<Page> {
 }
 
 test.describe('Question Types — US2: Meme question image reveal', () => {
+  test.describe.configure({ mode: 'serial' });
   test('presenter sees reveal button; clicking it reveals the image', async ({ page }) => {
     await page.goto('/quiz/sample-category/q4');
     await expect(page.getByText('Which meme best describes Monday mornings?')).toBeVisible({ timeout: 10000 });
@@ -84,6 +85,8 @@ test.describe('Question Types — US2: Meme question image reveal', () => {
 });
 
 test.describe('Question Types — US3: Singing Pianos box reveal', () => {
+  test.describe.configure({ mode: 'serial' });
+
   test('boxes start hidden and reveal on click', async ({ page }) => {
     await page.goto('/quiz/sample-category/q5');
     await expect(page.getByText('Press each box to reveal the hidden notes!')).toBeVisible({ timeout: 10000 });
@@ -91,15 +94,15 @@ test.describe('Question Types — US3: Singing Pianos box reveal', () => {
     // All boxes hidden initially
     const box0 = page.getByTestId('piano-box-0');
     const box1 = page.getByTestId('piano-box-1');
-    await expect(box0).toHaveText('?');
-    await expect(box1).toHaveText('?');
+    await expect(box0).toHaveText('𝄞');
+    await expect(box1).toHaveText('𝄞');
 
     // Click box 0 — reveals DO
     await box0.click();
     await expect(box0).toHaveText('DO', { timeout: 3000 });
 
     // Box 1 still hidden
-    await expect(box1).toHaveText('?');
+    await expect(box1).toHaveText('𝄞');
 
     // Click box 2 — reveals MI
     await page.getByTestId('piano-box-2').click();
@@ -117,7 +120,7 @@ test.describe('Question Types — US3: Singing Pianos box reveal', () => {
     ).toBeVisible({ timeout: 10000 });
 
     // All mirror boxes hidden
-    await expect(mirror.getByTestId('piano-box-0')).toHaveText('?');
+    await expect(mirror.getByTestId('piano-box-0')).toHaveText('𝄞');
 
     // Presenter reveals box 0
     await page.getByTestId('piano-box-0').click();
@@ -127,7 +130,7 @@ test.describe('Question Types — US3: Singing Pianos box reveal', () => {
     await expect(mirror.getByTestId('piano-box-0')).toHaveText('DO', { timeout: 5000 });
 
     // Mirror box 1 still hidden
-    await expect(mirror.getByTestId('piano-box-1')).toHaveText('?');
+    await expect(mirror.getByTestId('piano-box-1')).toHaveText('𝄞');
 
     // Presenter reveals box 2
     await page.getByTestId('piano-box-2').click();
@@ -156,10 +159,10 @@ test.describe('Question Types — US3: Singing Pianos box reveal', () => {
 
     // Mirror sees boxes 0 and 3 revealed, others hidden
     await expect(mirror.getByTestId('piano-box-0')).toHaveText('DO', { timeout: 5000 });
-    await expect(mirror.getByTestId('piano-box-1')).toHaveText('?');
-    await expect(mirror.getByTestId('piano-box-2')).toHaveText('?');
+    await expect(mirror.getByTestId('piano-box-1')).toHaveText('𝄞');
+    await expect(mirror.getByTestId('piano-box-2')).toHaveText('𝄞');
     await expect(mirror.getByTestId('piano-box-3')).toHaveText('FA', { timeout: 5000 });
-    await expect(mirror.getByTestId('piano-box-4')).toHaveText('?');
+    await expect(mirror.getByTestId('piano-box-4')).toHaveText('𝄞');
 
     await mirror.close();
   });
