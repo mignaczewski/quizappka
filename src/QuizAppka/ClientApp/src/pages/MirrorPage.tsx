@@ -3,9 +3,6 @@ import {
   Alert,
   Box,
   CircularProgress,
-  List,
-  ListItem,
-  ListItemText,
   Snackbar,
   Typography,
 } from '@mui/material';
@@ -16,6 +13,7 @@ import QuestionList from '../components/QuestionList';
 import QuestionDisplay from '../components/QuestionDisplay';
 import type { CategorySummary, CategoryDetail, Question, RevealState } from '../types/quiz';
 import type { StateUpdatedPayload } from '../types/mirror';
+import CategoryList from '../components/CategoryList';
 
 type MirrorScreen =
   | { screen: 'idle' }
@@ -98,7 +96,7 @@ export default function MirrorPage() {
 
   if (!connected) {
     return (
-      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+      <Box data-testid="page-layout" sx={{ width: '100%', pt: 4 }}>
         <Grid container columns={12}>
           <Grid size={10} offset={1} sx={{ display: 'flex', justifyContent: 'center' }}>
             <CircularProgress role="progressbar" aria-label="Connecting to presenter" />
@@ -118,7 +116,7 @@ export default function MirrorPage() {
 
   if (mirrorScreen.screen === 'idle') {
     return (
-      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+      <Box data-testid="page-layout" sx={{ width: '100%', pt: 4 }}>
         <Grid container columns={12}>
           <Grid size={10} offset={1}>
             {reconnectingBanner}
@@ -133,20 +131,14 @@ export default function MirrorPage() {
 
   if (mirrorScreen.screen === 'category-list') {
     return (
-      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+      <Box data-testid="page-layout" sx={{ width: '100%', pt: 4 }}>
         <Grid container columns={12}>
           <Grid size={10} offset={1}>
             {reconnectingBanner}
-            <Typography variant="h4" gutterBottom>
-              Quiz Categories
+            <Typography variant="h3" component="h1" gutterBottom>
+              QUIZ
             </Typography>
-            <List>
-              {categories.map((cat) => (
-                <ListItem key={cat.id}>
-                  <ListItemText primary={cat.name} />
-                </ListItem>
-              ))}
-            </List>
+            <CategoryList categories={categories} isMirror />
           </Grid>
         </Grid>
       </Box>
@@ -156,7 +148,7 @@ export default function MirrorPage() {
   if (mirrorScreen.screen === 'question-list') {
     if (!category) {
       return (
-        <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+        <Box data-testid="page-layout" sx={{ width: '100%', pt: 4 }}>
           <Grid container columns={12}>
             <Grid size={10} offset={1} sx={{ display: 'flex', justifyContent: 'center' }}>
               <CircularProgress role="progressbar" />
@@ -166,11 +158,11 @@ export default function MirrorPage() {
       );
     }
     return (
-      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+      <Box data-testid="page-layout" sx={{ width: '100%', pt: 4 }}>
         <Grid container columns={12}>
           <Grid size={10} offset={1}>
             {reconnectingBanner}
-            <Typography variant="h4" gutterBottom>
+            <Typography variant="h3" component="h1" gutterBottom>
               {category.name}
             </Typography>
             <QuestionList questions={category.questions} onSelectQuestion={() => {}} />
@@ -183,7 +175,7 @@ export default function MirrorPage() {
   if (mirrorScreen.screen === 'question-detail') {
     if (!category) {
       return (
-        <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+        <Box data-testid="page-layout" sx={{ width: '100%', pt: 4 }}>
           <Grid container columns={12}>
             <Grid size={10} offset={1} sx={{ display: 'flex', justifyContent: 'center' }}>
               <CircularProgress role="progressbar" />
@@ -193,11 +185,11 @@ export default function MirrorPage() {
       );
     }
     return (
-      <Box data-testid="page-layout" sx={{ width: '100%', minHeight: '100vh', pt: 4 }}>
+      <Box data-testid="page-layout" sx={{ width: '100%', pt: 4 }}>
         <Grid container columns={12}>
           <Grid size={10} offset={1}>
             {reconnectingBanner}
-            <Typography variant="h4" gutterBottom>
+            <Typography variant="h3" component="h1" gutterBottom>
               {category.name}
             </Typography>
             {question && (

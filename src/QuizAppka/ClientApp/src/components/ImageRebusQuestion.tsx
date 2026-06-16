@@ -14,6 +14,9 @@ export default function ImageRebusQuestion({ question, displayMode }: Props) {
 
   return (
     <Box>
+      {question.prompt && (
+        <Typography variant={isMirror ? 'h2' : 'h4'}>{question.prompt}</Typography>
+      )}
       <Box
         sx={{
           width: '100%',
@@ -50,9 +53,7 @@ export default function ImageRebusQuestion({ question, displayMode }: Props) {
           />
         )}
       </Box>
-      {question.prompt && (
-        <Typography variant={isMirror ? 'h2' : 'h4'}>{question.prompt}</Typography>
-      )}
+      
     </Box>
   );
 }

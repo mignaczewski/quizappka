@@ -1,58 +1,38 @@
-import { Chip, List, ListItemButton, ListItemText, Typography } from '@mui/material';
-import type { Question } from '../types/quiz';
+import {
+  List,
+  ListItemButton,
+  ListItemText,
+} from "@mui/material";
+import type { Question } from "../types/quiz";
 
 interface QuestionListProps {
   questions: Question[];
   onSelectQuestion: (questionId: string) => void;
 }
 
-function typeLabel(question: Question): string {
-  switch (question.type) {
-    case 'open':
-      return 'open';
-    case 'closed':
-      return 'closed';
-    case 'image-rebus':
-      return 'image rebus';
-    case 'meme':
-      return 'meme';
-    case 'singing-pianos':
-      return 'singing pianos';
-    default:
-      return 'unknown'; 
-  }
-}
-
-export default function QuestionList({ questions, onSelectQuestion }: QuestionListProps) {
+export default function QuestionList({
+  questions,
+  onSelectQuestion,
+}: QuestionListProps) {
   return (
     <List disablePadding>
-      {questions.map((question, index) => (
+      {questions.map((question) => (
         <ListItemButton
           key={question.id}
           onClick={() => onSelectQuestion(question.id)}
           divider
           sx={{ gap: 1.5, py: 1.5 }}
         >
-          <Typography
-            component="span"
-            variant="body2"
-            color="text.secondary"
-            sx={{ minWidth: 28, fontVariantNumeric: 'tabular-nums' }}
-          >
-            {index + 1}.
-          </Typography>
-          <Chip
-            label={typeLabel(question)}
-            size="small"
-            variant="outlined"
-            sx={{ minWidth: 90 }}
-          />
           <ListItemText
             primary={question.prompt}
             slotProps={{
               primary: {
                 noWrap: true,
-                sx: { overflow: 'hidden', textOverflow: 'ellipsis' },
+                sx: {
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  fontSize: "2rem",
+                },
               },
             }}
           />
