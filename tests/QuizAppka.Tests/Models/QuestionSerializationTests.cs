@@ -103,6 +103,134 @@ public class QuestionSerializationTests
     }
 
     [Fact]
+    public void MemeQuestion_WithPresenterHint_SerializesAndDeserializesCorrectly()
+    {
+        var question = new MemeQuestion
+        {
+            Id = "q1",
+            Prompt = "Which meme?",
+            EntryImage = "entry.jpg",
+            Options = [],
+            PresenterHint = "Scoring note for presenter.",
+        };
+
+        var json = JsonSerializer.Serialize<Question>(question, Options);
+        var deserialized = JsonSerializer.Deserialize<Question>(json, Options);
+
+        var meme = Assert.IsType<MemeQuestion>(deserialized);
+        Assert.Equal("Scoring note for presenter.", meme.PresenterHint);
+        Assert.Contains("\"presenterHint\"", json);
+    }
+
+    [Fact]
+    public void MemeQuestion_WithoutPresenterHint_HintIsAbsentFromJson()
+    {
+        var question = new MemeQuestion
+        {
+            Id = "q1",
+            Prompt = "Which meme?",
+            EntryImage = "entry.jpg",
+            Options = [],
+        };
+
+        var json = JsonSerializer.Serialize<Question>(question, Options);
+        var deserialized = JsonSerializer.Deserialize<Question>(json, Options);
+
+        var meme = Assert.IsType<MemeQuestion>(deserialized);
+        Assert.Null(meme.PresenterHint);
+        Assert.DoesNotContain("\"presenterHint\"", json);
+    }
+
+    [Fact]
+    public void SingingPianosQuestion_WithPresenterHint_SerializesAndDeserializesCorrectly()
+    {
+        var question = new SingingPianosQuestion
+        {
+            Id = "q1",
+            Prompt = "Reveal!",
+            Boxes = [new PianoBox { Id = "b1", HiddenText = "DO" }],
+            PresenterHint = "All You Need Is Love",
+        };
+
+        var json = JsonSerializer.Serialize<Question>(question, Options);
+        var deserialized = JsonSerializer.Deserialize<Question>(json, Options);
+
+        var pianos = Assert.IsType<SingingPianosQuestion>(deserialized);
+        Assert.Equal("All You Need Is Love", pianos.PresenterHint);
+        Assert.Contains("\"presenterHint\"", json);
+    }
+
+    [Fact]
+    public void SingingPianosQuestion_WithoutPresenterHint_HintIsAbsentFromJson()
+    {
+        var question = new SingingPianosQuestion
+        {
+            Id = "q1",
+            Prompt = "Reveal!",
+            Boxes = [],
+        };
+
+        var json = JsonSerializer.Serialize<Question>(question, Options);
+        var deserialized = JsonSerializer.Deserialize<Question>(json, Options);
+
+        var pianos = Assert.IsType<SingingPianosQuestion>(deserialized);
+        Assert.Null(pianos.PresenterHint);
+        Assert.DoesNotContain("\"presenterHint\"", json);
+    }
+
+    [Theory]
+    [InlineData("open")]
+    [InlineData("closed")]
+    [InlineData("meme")]
+    [InlineData("singing-pianos")]
+    [InlineData("image-rebus")]
+    public void Question_WithTitle_TitleRoundTripsCorrectly(string type)
+    {
+        Question question = type switch
+        {
+            "open" => new OpenQuestion { Id = "q1", Prompt = "Open?", Title = "Open Title" },
+            "closed" => new ClosedQuestion { Id = "q1", Prompt = "Closed?", Title = "Closed Title", Options = [] },
+            "meme" => new MemeQuestion { Id = "q1", Prompt = "Meme?", Title = "Meme Title", EntryImage = "e.jpg", Options = [] },
+            "singing-pianos" => new SingingPianosQuestion { Id = "q1", Prompt = "Piano?", Title = "Piano Title", Boxes = [] },
+            "image-rebus" => new ImageRebusQuestion { Id = "q1", Prompt = "Rebus?", Title = "Rebus Title", ImageRef = "r.png" },
+            _ => throw new InvalidOperationException(),
+        };
+
+        var json = JsonSerializer.Serialize<Question>(question, Options);
+        var deserialized = JsonSerializer.Deserialize<Question>(json, Options);
+
+        Assert.NotNull(deserialized);
+        Assert.Equal("Title", deserialized.Title?.Split(' ')[1]);
+        Assert.Contains("\"title\"", json);
+    }
+
+    [Theory]
+    [InlineData("open")]
+    [InlineData("closed")]
+    [InlineData("meme")]
+    [InlineData("singing-pianos")]
+    [InlineData("image-rebus")]
+    public void Question_WithoutTitle_TitleIsAbsentFromJson(string type)
+    {
+        Question question = type switch
+        {
+            "open" => new OpenQuestion { Id = "q1", Prompt = "Open?" },
+            "closed" => new ClosedQuestion { Id = "q1", Prompt = "Closed?", Options = [] },
+            "meme" => new MemeQuestion { Id = "q1", Prompt = "Meme?", EntryImage = "e.jpg", Options = [] },
+            "singing-pianos" => new SingingPianosQuestion { Id = "q1", Prompt = "Piano?", Boxes = [] },
+            "image-rebus" => new ImageRebusQuestion { Id = "q1", Prompt = "Rebus?", ImageRef = "r.png" },
+            _ => throw new InvalidOperationException(),
+        };
+
+        var json = JsonSerializer.Serialize<Question>(question, Options);
+        var deserialized = JsonSerializer.Deserialize<Question>(json, Options);
+
+        Assert.NotNull(deserialized);
+        Assert.Null(deserialized.Title);
+        Assert.DoesNotContain("\"title\"", json);
+    }
+
+    [Fact]
     public void PresenterStateDto_WithRevealState_SerializesCorrectly()
     {
         var dto = new PresenterStateDto(

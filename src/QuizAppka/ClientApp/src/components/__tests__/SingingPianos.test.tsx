@@ -90,4 +90,36 @@ describe('SingingPianos', () => {
       expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Press to reveal!');
     });
   });
+
+  describe('presenterHint', () => {
+    const questionWithHint: SingingPianosQuestionType = {
+      ...question,
+      presenterHint: 'All You Need Is Love',
+    };
+    const questionWithUrlHint: SingingPianosQuestionType = {
+      ...question,
+      presenterHint: 'https://example.com/source',
+    };
+
+    it('renders hint text in presenter mode (default)', () => {
+      render(<SingingPianos question={questionWithHint} />);
+      expect(screen.getByTestId('presenter-hint')).toHaveTextContent('All You Need Is Love');
+    });
+
+    it('renders hint as a link when hint is a URL', () => {
+      render(<SingingPianos question={questionWithUrlHint} />);
+      const link = screen.getByRole('link', { name: 'https://example.com/source' });
+      expect(link).toHaveAttribute('href', 'https://example.com/source');
+    });
+
+    it('does not render hint in mirror mode', () => {
+      render(<SingingPianos question={questionWithHint} displayMode="mirror" />);
+      expect(screen.queryByTestId('presenter-hint')).not.toBeInTheDocument();
+    });
+
+    it('does not render hint block when presenterHint is undefined', () => {
+      render(<SingingPianos question={question} />);
+      expect(screen.queryByTestId('presenter-hint')).not.toBeInTheDocument();
+    });
+  });
 });

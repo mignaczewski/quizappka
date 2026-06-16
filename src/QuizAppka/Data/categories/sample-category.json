@@ -5,12 +5,14 @@
     {
       "id": "q1",
       "type": "open",
+      "title": "Capital of France",
       "prompt": "What is the capital of France?",
       "presenterHint": "The answer is Paris. It's known as the City of Light."
     },
     {
       "id": "q2",
       "type": "closed",
+      "title": "Closest Planet",
       "prompt": "Which planet is closest to the Sun?",
       "options": [
         { "id": "a", "text": "Venus" },
@@ -22,12 +24,14 @@
     {
       "id": "q3",
       "type": "image-rebus",
+      "title": "Mystery Animal",
       "prompt": "What animal is shown?",
       "imageRef": "kowal.jpg"
     },
     {
       "id": "q4",
       "type": "meme",
+      "title": "Monday Mornings Meme",
       "prompt": "Which meme best describes Monday mornings?",
       "entryImage": "meme-question.jpg",
       "revealImage": "kowal.jpg",
@@ -44,11 +48,13 @@
           "id": "c",
           "text": "Surprised Pikachu"
         }
-      ]
+      ],
+      "presenterHint": "All three are valid Monday moods. There is no wrong answer here."
     },
     {
       "id": "q5",
       "type": "singing-pianos",
+      "title": "Solfège Notes",
       "prompt": "Press each box to reveal the hidden notes!",
       "boxes": [
         { "id": "box1", "hiddenText": "DO" },
@@ -56,7 +62,8 @@
         { "id": "box3", "hiddenText": "MI" },
         { "id": "box4", "hiddenText": "FA" },
         { "id": "box5", "hiddenText": "SOL" }
-      ]
+      ],
+      "presenterHint": "Do Re Mi Fa Sol — the first five notes of the C major scale."
     }
   ]
 }

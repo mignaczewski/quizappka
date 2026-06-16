@@ -10,6 +10,17 @@ interface QuestionListProps {
   onSelectQuestion: (questionId: string) => void;
 }
 
+function getQuestionLabel(question: Question): string {
+  if (question.title?.trim()) return question.title;
+  if (question.prompt?.trim()) return question.prompt;
+  switch (question.type) {
+    case "meme": return "Meme Question";
+    case "singing-pianos": return "Singing Pianos";
+    case "image-rebus": return "Image Rebus";
+    default: return question.type;
+  }
+}
+
 export default function QuestionList({
   questions,
   onSelectQuestion,
@@ -24,7 +35,7 @@ export default function QuestionList({
           sx={{ gap: 1.5, py: 1.5 }}
         >
           <ListItemText
-            primary={question.prompt}
+            primary={getQuestionLabel(question)}
             slotProps={{
               primary: {
                 noWrap: true,

@@ -61,9 +61,13 @@ public class QuizController : ControllerBase
     private static Question StripPresenterData(Question question) => question switch
     {
         ClosedQuestion closed when closed.PresenterHint is not null
-            => new ClosedQuestion { Id = closed.Id, Prompt = closed.Prompt, Options = closed.Options },
+            => new ClosedQuestion { Id = closed.Id, Prompt = closed.Prompt, Title = closed.Title, Options = closed.Options },
         OpenQuestion open when open.PresenterHint is not null
-            => new OpenQuestion { Id = open.Id, Prompt = open.Prompt },
+            => new OpenQuestion { Id = open.Id, Prompt = open.Prompt, Title = open.Title },
+        MemeQuestion meme when meme.PresenterHint is not null
+            => new MemeQuestion { Id = meme.Id, Prompt = meme.Prompt, Title = meme.Title, EntryImage = meme.EntryImage, RevealImage = meme.RevealImage, Options = meme.Options },
+        SingingPianosQuestion piano when piano.PresenterHint is not null
+            => new SingingPianosQuestion { Id = piano.Id, Prompt = piano.Prompt, Title = piano.Title, Boxes = piano.Boxes },
         _ => question,
     };
 }

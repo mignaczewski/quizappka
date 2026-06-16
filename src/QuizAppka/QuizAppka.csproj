@@ -13,4 +13,10 @@
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="10.0.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\categories\sample-category.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
