@@ -86,6 +86,23 @@ public class QuestionSerializationTests
     }
 
     [Fact]
+    public void TimedOpenQuestion_SerializesAndDeserializesCorrectly()
+    {
+        var question = new TimedOpenQuestion
+        {
+            Id = "q6",
+            Prompt = "Name three planets",
+            InitialDurationSeconds = 60,
+        };
+
+        var json = JsonSerializer.Serialize<Question>(question, Options);
+        var deserialized = JsonSerializer.Deserialize<Question>(json, Options);
+
+        var timed = Assert.IsType<TimedOpenQuestion>(deserialized);
+        Assert.Equal(60, timed.InitialDurationSeconds);
+    }
+
+    [Fact]
     public void RevealState_SerializesAndDeserializesCorrectly()
     {
         var state = new RevealState(MemeImageRevealed: true, SingingPianosBoxesRevealed: [new PianoBoxReveal("box1", true), new PianoBoxReveal("box2", false), new PianoBoxReveal("box3", true)]);
@@ -237,7 +254,9 @@ public class QuestionSerializationTests
             Screen: "question-detail",
             CategoryId: "cat1",
             QuestionId: "q1",
-            RevealState: new RevealState(MemeImageRevealed: true));
+            RevealState: new RevealState(
+                MemeImageRevealed: true,
+                TimerState: new QuestionTimerState("running", 60, 42, "2026-06-20T10:00:00Z")));
 
         var json = JsonSerializer.Serialize(dto, Options);
         var deserialized = JsonSerializer.Deserialize<PresenterStateDto>(json, Options);
@@ -245,6 +264,9 @@ public class QuestionSerializationTests
         Assert.NotNull(deserialized);
         Assert.NotNull(deserialized.RevealState);
         Assert.True(deserialized.RevealState.MemeImageRevealed);
+        Assert.NotNull(deserialized.RevealState.TimerState);
+        Assert.Equal("running", deserialized.RevealState.TimerState!.Status);
+        Assert.Equal(42, deserialized.RevealState.TimerState.RemainingSeconds);
     }
 
     [Fact]

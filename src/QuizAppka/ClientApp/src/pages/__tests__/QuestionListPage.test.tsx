@@ -83,13 +83,13 @@ describe('QuestionListPage', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
   });
 
-  it('shows all question types without filtering', async () => {
+  it('shows all questions without filtering', async () => {
     vi.mocked(quizApi.fetchCategory).mockResolvedValue(mockCategory);
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('open')).toBeInTheDocument();
-      expect(screen.getByText('closed')).toBeInTheDocument();
-      expect(screen.getByText('image rebus')).toBeInTheDocument();
+      expect(screen.getByText('What is gravity?')).toBeInTheDocument();
+      expect(screen.getByText('Atomic number of Carbon?')).toBeInTheDocument();
+      expect(screen.getByText('Name the element')).toBeInTheDocument();
     });
   });
 

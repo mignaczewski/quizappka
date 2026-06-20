@@ -3,7 +3,21 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import MirrorPage from '../MirrorPage';
 
-type StateUpdatedCallback = (payload: { screen: string; categoryId?: string | null; questionId?: string | null }) => void;
+type StateUpdatedPayloadTest = {
+  screen: string;
+  categoryId?: string | null;
+  questionId?: string | null;
+  revealState?: {
+    timerState?: {
+      status: 'idle' | 'running' | 'paused' | 'ended';
+      initialDurationSeconds: number;
+      remainingSeconds: number;
+      lastUpdatedAtUtc?: string | null;
+    };
+  };
+};
+
+type StateUpdatedCallback = (payload: StateUpdatedPayloadTest) => void;
 
 const mockOn = vi.fn();
 const mockOff = vi.fn();
@@ -31,7 +45,10 @@ vi.mock('../../services/quizApi', () => ({
     Promise.resolve({
       id: 'cat1',
       name: 'Science',
-      questions: [{ id: 'q1', type: 'open', prompt: 'What is 2+2?' }],
+      questions: [
+        { id: 'q1', type: 'open', prompt: 'What is 2+2?' },
+        { id: 'q2', type: 'timed-open', prompt: 'Name two gases.', initialDurationSeconds: 45 },
+      ],
     }),
   ),
 }));
@@ -74,7 +91,7 @@ describe('MirrorPage', () => {
     });
 
     await waitFor(() =>
-      expect(screen.getByText('Quiz Categories')).toBeInTheDocument(),
+      expect(screen.getByText('QUIZ')).toBeInTheDocument(),
     );
   });
 
@@ -98,6 +115,81 @@ describe('MirrorPage', () => {
     });
 
     await waitFor(() => expect(screen.getByText(/2\+2/)).toBeInTheDocument());
+  });
+
+  it('renders timed-open timer value from StateUpdated revealState', async () => {
+    renderMirrorPage();
+    await waitFor(() => expect(mockStart).toHaveBeenCalled());
+
+    act(() => {
+      onStateUpdated?.({
+        screen: 'question-detail',
+        categoryId: 'cat1',
+        questionId: 'q2',
+        revealState: {
+          timerState: {
+            status: 'running',
+            initialDurationSeconds: 45,
+            remainingSeconds: 33,
+            lastUpdatedAtUtc: '2026-06-20T10:00:00Z',
+          },
+        },
+      });
+    });
+
+    await waitFor(() => expect(screen.getByText('Name two gases.')).toBeInTheDocument());
+    expect(screen.getByTestId('timed-open-timer')).toHaveTextContent('00:33');
+    expect(screen.getByTestId('timed-open-status')).toHaveTextContent('running');
+  });
+
+  it('renders paused timer state from StateUpdated revealState', async () => {
+    renderMirrorPage();
+    await waitFor(() => expect(mockStart).toHaveBeenCalled());
+
+    act(() => {
+      onStateUpdated?.({
+        screen: 'question-detail',
+        categoryId: 'cat1',
+        questionId: 'q2',
+        revealState: {
+          timerState: {
+            status: 'paused',
+            initialDurationSeconds: 45,
+            remainingSeconds: 20,
+            lastUpdatedAtUtc: '2026-06-20T10:00:00Z',
+          },
+        },
+      });
+    });
+
+    await waitFor(() => expect(screen.getByText('Name two gases.')).toBeInTheDocument());
+    expect(screen.getByTestId('timed-open-timer')).toHaveTextContent('00:20');
+    expect(screen.getByTestId('timed-open-status')).toHaveTextContent('paused');
+  });
+
+  it('renders reset idle timer state from StateUpdated revealState', async () => {
+    renderMirrorPage();
+    await waitFor(() => expect(mockStart).toHaveBeenCalled());
+
+    act(() => {
+      onStateUpdated?.({
+        screen: 'question-detail',
+        categoryId: 'cat1',
+        questionId: 'q2',
+        revealState: {
+          timerState: {
+            status: 'idle',
+            initialDurationSeconds: 45,
+            remainingSeconds: 45,
+            lastUpdatedAtUtc: '2026-06-20T10:00:00Z',
+          },
+        },
+      });
+    });
+
+    await waitFor(() => expect(screen.getByText('Name two gases.')).toBeInTheDocument());
+    expect(screen.getByTestId('timed-open-timer')).toHaveTextContent('00:45');
+    expect(screen.getByTestId('timed-open-status')).toHaveTextContent('idle');
   });
 
   it('renders question prompt as h2 heading in question-detail mode (displayMode mirror)', async () => {

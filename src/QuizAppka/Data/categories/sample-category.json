@@ -64,6 +64,12 @@
         { "id": "box5", "hiddenText": "SOL" }
       ],
       "presenterHint": "Do Re Mi Fa Sol — the first five notes of the C major scale."
+    },
+    {
+      "id": "q6",
+      "type": "timed-open",
+      "prompt": "Name three programming languages you use most often.",
+      "initialDurationSeconds": 60
     }
   ]
 }

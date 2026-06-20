@@ -28,29 +28,29 @@ describe('SingingPianos', () => {
     render(<SingingPianos question={question} />);
     const boxes = question.boxes.map((_, i) => screen.getByTestId(`piano-box-${i}`));
     expect(boxes).toHaveLength(5);
-    boxes.forEach((box) => expect(box).toHaveTextContent('?'));
+    boxes.forEach((box) => expect(box).toHaveTextContent('𝄞'));
   });
 
   it('reveals text of a box when its entry in revealedBoxes has revealed: true', () => {
     const revealedBoxes: PianoBoxReveal[] = [{ id: 'box1', revealed: true }];
     render(<SingingPianos question={question} revealedBoxes={revealedBoxes} />);
     expect(screen.getByTestId('piano-box-0')).toHaveTextContent('DO');
-    expect(screen.getByTestId('piano-box-1')).toHaveTextContent('?');
+    expect(screen.getByTestId('piano-box-1')).toHaveTextContent('𝄞');
   });
 
   it('does not reveal a box whose entry has revealed: false', () => {
     const revealedBoxes: PianoBoxReveal[] = [{ id: 'box1', revealed: false }];
     render(<SingingPianos question={question} revealedBoxes={revealedBoxes} />);
-    expect(screen.getByTestId('piano-box-0')).toHaveTextContent('?');
+    expect(screen.getByTestId('piano-box-0')).toHaveTextContent('𝄞');
   });
 
   it('reveals a non-first box by id regardless of array order', () => {
     const revealedBoxes: PianoBoxReveal[] = [{ id: 'box3', revealed: true }];
     render(<SingingPianos question={question} revealedBoxes={revealedBoxes} />);
-    expect(screen.getByTestId('piano-box-0')).toHaveTextContent('?');
-    expect(screen.getByTestId('piano-box-1')).toHaveTextContent('?');
+    expect(screen.getByTestId('piano-box-0')).toHaveTextContent('𝄞');
+    expect(screen.getByTestId('piano-box-1')).toHaveTextContent('𝄞');
     expect(screen.getByTestId('piano-box-2')).toHaveTextContent('MI');
-    expect(screen.getByTestId('piano-box-3')).toHaveTextContent('?');
+    expect(screen.getByTestId('piano-box-3')).toHaveTextContent('𝄞');
   });
 
   it('calls onBoxReveal with the box id when unrevealed box is clicked', async () => {
@@ -80,9 +80,9 @@ describe('SingingPianos', () => {
   });
 
   describe('displayMode', () => {
-    it('renders prompt as h4 by default (presenter mode)', () => {
+    it('renders prompt as h2 by default (presenter mode)', () => {
       render(<SingingPianos question={question} />);
-      expect(screen.getByRole('heading', { level: 4 })).toHaveTextContent('Press to reveal!');
+      expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Press to reveal!');
     });
 
     it('renders prompt as h2 in mirror mode', () => {

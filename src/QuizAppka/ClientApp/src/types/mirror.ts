@@ -8,7 +8,7 @@ export type PresenterScreen =
 
 export interface StateUpdatedPayload {
   screen: string;
-  categoryId?: string;
-  questionId?: string;
+  categoryId?: string | null;
+  questionId?: string | null;
   revealState?: RevealState | null;
 }

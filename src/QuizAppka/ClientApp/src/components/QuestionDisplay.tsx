@@ -1,6 +1,7 @@
 import { Alert } from '@mui/material';
 import type { Question, RevealState, DisplayMode } from '../types/quiz';
 import OpenQuestion from './OpenQuestion';
+import TimedOpenQuestion from './TimedOpenQuestion';
 import ClosedQuestion from './ClosedQuestion';
 import ImageRebusQuestionComponent from './ImageRebusQuestion';
 import MemeQuestion from './MemeQuestion';
@@ -11,11 +12,25 @@ interface Props {
   revealState?: RevealState | null;
   onReveal?: () => void;
   onBoxReveal?: (boxId: string) => void;
+  onStartTimer?: () => void;
+  onPauseTimer?: () => void;
+  onResetTimer?: () => void;
   displayMode?: DisplayMode;
 }
 
-export default function QuestionDisplay({ question, revealState, onReveal, onBoxReveal, displayMode }: Props) {
+export default function QuestionDisplay({ question, revealState, onReveal, onBoxReveal, onStartTimer, onPauseTimer, onResetTimer, displayMode }: Props) {
   switch (question.type) {
+    case 'timed-open':
+      return (
+        <TimedOpenQuestion
+          question={question}
+          timerState={revealState?.timerState}
+          onStartTimer={onStartTimer}
+          onPauseTimer={onPauseTimer}
+          onResetTimer={onResetTimer}
+          displayMode={displayMode}
+        />
+      );
     case 'open':
       return <OpenQuestion question={question} displayMode={displayMode} />;
     case 'closed':

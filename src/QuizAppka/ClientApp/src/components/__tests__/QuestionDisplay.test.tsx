@@ -8,6 +8,26 @@ describe('QuestionDisplay', () => {
     const q: Question = { id: 'q1', type: 'open', prompt: 'Open question?' };
     render(<QuestionDisplay question={q} />);
     expect(screen.getByText('Open question?')).toBeInTheDocument();
+    expect(screen.queryByTestId('timed-open-timer')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('timed-open-start')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('timed-open-status')).not.toBeInTheDocument();
+  });
+
+  it('does not render timer UI for open type even when revealState carries timerState', () => {
+    const q: Question = { id: 'q1', type: 'open', prompt: 'Open question?' };
+    const revealState: RevealState = {
+      timerState: {
+        status: 'running',
+        initialDurationSeconds: 60,
+        remainingSeconds: 42,
+        lastUpdatedAtUtc: '2026-06-20T10:00:00Z',
+      },
+    };
+    render(<QuestionDisplay question={q} revealState={revealState} />);
+    expect(screen.getByText('Open question?')).toBeInTheDocument();
+    expect(screen.queryByTestId('timed-open-timer')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('timed-open-start')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('timed-open-status')).not.toBeInTheDocument();
   });
 
   it('renders ClosedQuestion for closed type', () => {
@@ -88,7 +108,7 @@ describe('QuestionDisplay', () => {
     const revealState: RevealState = { singingPianosBoxesRevealed: [{ id: 'b1', revealed: true }, { id: 'b2', revealed: false }] };
     render(<QuestionDisplay question={q} revealState={revealState} />);
     expect(screen.getByTestId('piano-box-0')).toHaveTextContent('DO');
-    expect(screen.getByTestId('piano-box-1')).toHaveTextContent('?');
+    expect(screen.getByTestId('piano-box-1')).toHaveTextContent('𝄞');
   });
 
   it('renders fallback message for unknown type', () => {
