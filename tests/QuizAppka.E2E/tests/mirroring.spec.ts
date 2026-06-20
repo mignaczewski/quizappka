@@ -1,11 +1,15 @@
 import { test, expect, type Page } from '@playwright/test';
 
+test.describe.configure({ mode: 'serial' });
+
 async function openMirror(presenterPage: Page): Promise<Page> {
   const context = presenterPage.context();
   const mirrorPage = await context.newPage();
   await mirrorPage.goto('/mirror');
   return mirrorPage;
 }
+
+const TIMED_OPEN_ROUTE = '/quiz/sample-category/q6';
 
 test.describe('Mirroring — US2: Mirror follows presenter navigation', () => {
   test('mirror updates as presenter navigates through the quiz flow', async ({ page }) => {
@@ -108,6 +112,43 @@ test.describe('Mirroring — US3: Multiple simultaneous mirror views', () => {
 
     // Must NOT show idle/waiting state
     await expect(mirror.getByRole('status')).not.toBeVisible();
+
+    await mirror.close();
+  });
+});
+
+test.describe('Mirroring — US1: Timed open start synchronization', () => {
+  test('mirror shows running timed-open countdown after presenter starts timer', async ({ page }) => {
+    await page.goto(TIMED_OPEN_ROUTE);
+    await expect(page.getByText('Name three programming languages you use most often.')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId('timed-open-timer')).toHaveText('01:00');
+
+    const mirror = await openMirror(page);
+    await expect(mirror.getByText('Name three programming languages you use most often.')).toBeVisible({ timeout: 10000 });
+    await expect(mirror.getByTestId('timed-open-timer')).toHaveText('01:00');
+
+    await page.getByTestId('timed-open-start').click();
+
+    await expect(page.getByTestId('timed-open-timer')).toHaveText('00:59', { timeout: 3000 });
+    await expect(mirror.getByTestId('timed-open-timer')).toHaveText('00:59', { timeout: 5000 });
+
+    await mirror.close();
+  });
+
+  test('mirror receives timer-start update within one second', async ({ page }) => {
+    await page.goto(TIMED_OPEN_ROUTE);
+    await expect(page.getByTestId('timed-open-start')).toBeVisible({ timeout: 10000 });
+
+    const mirror = await openMirror(page);
+    await expect(mirror.getByTestId('timed-open-timer')).toHaveText('01:00', { timeout: 10000 });
+    await expect(mirror.getByTestId('timed-open-status')).toHaveText('idle', { timeout: 10000 });
+
+    const startedAt = Date.now();
+    await page.getByTestId('timed-open-start').click();
+    await expect(mirror.getByTestId('timed-open-status')).toHaveText('running', { timeout: 5000 });
+    const elapsedMs = Date.now() - startedAt;
+
+    expect(elapsedMs).toBeLessThanOrEqual(1000);
 
     await mirror.close();
   });

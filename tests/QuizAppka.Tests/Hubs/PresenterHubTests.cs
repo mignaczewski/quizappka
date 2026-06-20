@@ -208,4 +208,113 @@ public class PresenterHubTests : IClassFixture<WebApplicationFactory<Program>>
         await sender.DisposeAsync();
         await receiver.DisposeAsync();
     }
+
+    [Fact]
+    public async Task UpdateState_WithTimerState_BroadcastsContractFields()
+    {
+        var connection1 = BuildConnection();
+        var connection2 = BuildConnection();
+
+        PresenterStateDto? received = null;
+        connection2.On<PresenterStateDto>("StateUpdated", s => received = s);
+
+        await connection1.StartAsync();
+        await connection2.StartAsync();
+
+        var timerState = new QuestionTimerState(
+            Status: "running",
+            InitialDurationSeconds: 60,
+            RemainingSeconds: 48,
+            LastUpdatedAtUtc: "2026-06-20T10:00:00Z");
+
+        await connection1.InvokeAsync(
+            "UpdateState",
+            new PresenterStateDto(
+                Screen: "question-detail",
+                CategoryId: "cat1",
+                QuestionId: "q6",
+                RevealState: new RevealState(TimerState: timerState)));
+
+        await Task.Delay(200);
+
+        Assert.NotNull(received);
+        Assert.NotNull(received.RevealState);
+        Assert.NotNull(received.RevealState.TimerState);
+        Assert.Equal("running", received.RevealState.TimerState!.Status);
+        Assert.Equal(60, received.RevealState.TimerState.InitialDurationSeconds);
+        Assert.Equal(48, received.RevealState.TimerState.RemainingSeconds);
+
+        await connection1.DisposeAsync();
+        await connection2.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task OnConnectedAsync_SendsPausedTimerState_ToLateJoiner()
+    {
+        var sender = BuildConnection();
+        await sender.StartAsync();
+
+        var pausedTimer = new QuestionTimerState(
+            Status: "paused",
+            InitialDurationSeconds: 60,
+            RemainingSeconds: 27,
+            LastUpdatedAtUtc: "2026-06-20T10:00:00Z");
+
+        await sender.InvokeAsync("UpdateState", new PresenterStateDto(
+            Screen: "question-detail",
+            CategoryId: "cat1",
+            QuestionId: "q6",
+            RevealState: new RevealState(TimerState: pausedTimer)));
+
+        var receiver = BuildConnection();
+        PresenterStateDto? received = null;
+        receiver.On<PresenterStateDto>("StateUpdated", s => received = s);
+        await receiver.StartAsync();
+
+        await Task.Delay(200);
+
+        Assert.NotNull(received);
+        Assert.NotNull(received.RevealState);
+        Assert.NotNull(received.RevealState.TimerState);
+        Assert.Equal("paused", received.RevealState.TimerState!.Status);
+        Assert.Equal(27, received.RevealState.TimerState.RemainingSeconds);
+
+        await sender.DisposeAsync();
+        await receiver.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task OnConnectedAsync_SendsResetIdleTimerState_ToLateJoiner()
+    {
+        var sender = BuildConnection();
+        await sender.StartAsync();
+
+        var idleTimer = new QuestionTimerState(
+            Status: "idle",
+            InitialDurationSeconds: 60,
+            RemainingSeconds: 60,
+            LastUpdatedAtUtc: "2026-06-20T10:00:00Z");
+
+        await sender.InvokeAsync("UpdateState", new PresenterStateDto(
+            Screen: "question-detail",
+            CategoryId: "cat1",
+            QuestionId: "q6",
+            RevealState: new RevealState(TimerState: idleTimer)));
+
+        var receiver = BuildConnection();
+        PresenterStateDto? received = null;
+        receiver.On<PresenterStateDto>("StateUpdated", s => received = s);
+        await receiver.StartAsync();
+
+        await Task.Delay(200);
+
+        Assert.NotNull(received);
+        Assert.NotNull(received.RevealState);
+        Assert.NotNull(received.RevealState.TimerState);
+        Assert.Equal("idle", received.RevealState.TimerState!.Status);
+        Assert.Equal(60, received.RevealState.TimerState.RemainingSeconds);
+
+        await sender.DisposeAsync();
+        await receiver.DisposeAsync();
+    }
 }

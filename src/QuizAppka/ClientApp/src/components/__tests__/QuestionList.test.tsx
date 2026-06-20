@@ -43,18 +43,18 @@ describe('QuestionList', () => {
     expect(screen.getAllByRole('button')).toHaveLength(3);
   });
 
-  it('shows 1-based question number for each entry', () => {
+  it('does not render numeric prefixes for entries', () => {
     render(<QuestionList questions={questions} onSelectQuestion={vi.fn()} />);
-    expect(screen.getByText(/1\./)).toBeInTheDocument();
-    expect(screen.getByText(/2\./)).toBeInTheDocument();
-    expect(screen.getByText(/3\./)).toBeInTheDocument();
+    expect(screen.queryByText(/1\./)).not.toBeInTheDocument();
+    expect(screen.queryByText(/2\./)).not.toBeInTheDocument();
+    expect(screen.queryByText(/3\./)).not.toBeInTheDocument();
   });
 
-  it('shows type badge for each question', () => {
+  it('does not render type badges in list entries', () => {
     render(<QuestionList questions={questions} onSelectQuestion={vi.fn()} />);
-    expect(screen.getByText('open')).toBeInTheDocument();
-    expect(screen.getByText('closed')).toBeInTheDocument();
-    expect(screen.getByText('image rebus')).toBeInTheDocument();
+    expect(screen.queryByText('open')).not.toBeInTheDocument();
+    expect(screen.queryByText('closed')).not.toBeInTheDocument();
+    expect(screen.queryByText('image rebus')).not.toBeInTheDocument();
   });
 
   it('shows prompt preview for each entry', () => {

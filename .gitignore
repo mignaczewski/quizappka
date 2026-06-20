@@ -17,6 +17,7 @@ packages/
 # Frontend
 src/QuizAppka/ClientApp/node_modules/
 src/QuizAppka/ClientApp/dist/
+src/QuizAppka/ClientApp/build/
 src/QuizAppka/wwwroot/
 tests/QuizAppka.E2E/node_modules/
 
@@ -38,6 +39,8 @@ test-results/
 # OS
 .DS_Store
 Thumbs.db
+*.tmp
+*.swp
 
 # IDE
 .idea/

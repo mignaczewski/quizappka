@@ -15,6 +15,11 @@ export interface OpenQuestion extends BaseQuestion {
   presenterHint?: string;
 }
 
+export interface TimedOpenQuestion extends BaseQuestion {
+  type: 'timed-open';
+  initialDurationSeconds: number;
+}
+
 export interface ClosedQuestion extends BaseQuestion {
   type: 'closed';
   options: AnswerOption[];
@@ -53,9 +58,19 @@ export interface PianoBoxReveal {
 export interface RevealState {
   memeImageRevealed?: boolean | null;
   singingPianosBoxesRevealed?: PianoBoxReveal[] | null;
+  timerState?: QuestionTimerState | null;
 }
 
-export type Question = OpenQuestion | ClosedQuestion | ImageRebusQuestion | MemeQuestion | SingingPianosQuestion;
+export type TimerStatus = 'idle' | 'running' | 'paused' | 'ended';
+
+export interface QuestionTimerState {
+  status: TimerStatus;
+  initialDurationSeconds: number;
+  remainingSeconds: number;
+  lastUpdatedAtUtc?: string | null;
+}
+
+export type Question = TimedOpenQuestion | OpenQuestion | ClosedQuestion | ImageRebusQuestion | MemeQuestion | SingingPianosQuestion;
 
 export type DisplayMode = 'presenter' | 'mirror';
 

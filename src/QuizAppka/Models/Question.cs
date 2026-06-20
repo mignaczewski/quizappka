@@ -4,6 +4,7 @@ namespace QuizAppka.Models;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(OpenQuestion), "open")]
+[JsonDerivedType(typeof(TimedOpenQuestion), "timed-open")]
 [JsonDerivedType(typeof(ClosedQuestion), "closed")]
 [JsonDerivedType(typeof(ImageRebusQuestion), "image-rebus")]
 [JsonDerivedType(typeof(MemeQuestion), "meme")]

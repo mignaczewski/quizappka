@@ -18,6 +18,15 @@ describe('OpenQuestion', () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
+  it('does not render timed-open timer UI for regular open questions', () => {
+    render(<OpenQuestion question={{ id: 'q1', type: 'open', prompt: 'A question?' }} />);
+    expect(screen.queryByTestId('timed-open-timer')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('timed-open-status')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('timed-open-start')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('timed-open-pause')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('timed-open-reset')).not.toBeInTheDocument();
+  });
+
   it('does not render hint section when presenterHint is absent', () => {
     render(<OpenQuestion question={{ id: 'q1', type: 'open', prompt: 'A question?' }} />);
     expect(screen.queryByTestId('presenter-hint')).not.toBeInTheDocument();

@@ -535,6 +535,61 @@ public class QuizControllerTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.Contains("Capital of France", json, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("presenterHint", json, StringComparison.OrdinalIgnoreCase);
     }
+
+    [Fact]
+    public async Task GetCategory_PublicEndpoint_IncludesTimedOpenInitialDuration()
+    {
+        var fakeService = new FakeQuizDataService(
+        [
+            new QuizCategory
+            {
+                Id = "cat1",
+                Name = "Cat 1",
+                Questions =
+                [
+                    new TimedOpenQuestion { Id = "q6", Prompt = "Timed?", InitialDurationSeconds = 60 },
+                ],
+            },
+        ]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/categories/cat1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        Assert.Contains("timed-open", json, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("initialDurationSeconds", json, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task GetPresenterCategory_IncludesTimedOpenInitialDuration()
+    {
+        var fakeService = new FakeQuizDataService(
+        [
+            new QuizCategory
+            {
+                Id = "cat1",
+                Name = "Cat 1",
+                Questions =
+                [
+                    new TimedOpenQuestion { Id = "q6", Prompt = "Timed?", InitialDurationSeconds = 75 },
+                ],
+            },
+        ]);
+
+        using var factory = CreateFactoryWithService(fakeService);
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/quiz/presenter/categories/cat1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        Assert.Contains("timed-open", json, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("initialDurationSeconds", json, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("75", json, StringComparison.OrdinalIgnoreCase);
+    }
 }
 
 file class FakeQuizDataService : IQuizDataService

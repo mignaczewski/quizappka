@@ -124,6 +124,14 @@ public class QuizDataService : IQuizDataService
                 continue;
             }
 
+            if (question is TimedOpenQuestion timedOpen && timedOpen.InitialDurationSeconds <= 0)
+            {
+                logger.LogWarning(
+                    "Timed-open question '{QuestionId}' in category '{CategoryId}' has non-positive initialDurationSeconds; skipping",
+                    question.Id, categoryId);
+                continue;
+            }
+
             valid.Add(question);
         }
 

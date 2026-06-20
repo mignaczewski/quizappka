@@ -1,6 +1,6 @@
 # quizappka Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-06-16
+Auto-generated from all feature plans. Last updated: 2026-06-20
 
 ## Active Technologies
 - C# / .NET 10 (backend), TypeScript 5.8 / React 19 (frontend) + ASP.NET Core 10, React 19, MUI 7.3, React Router DOM 7.13, Vite 6.3 (002-question-list-navigation)
@@ -15,8 +15,9 @@ Auto-generated from all feature plans. Last updated: 2026-06-16
 - N/A — frontend-only layout change (007-quiz-layout-improvements)
 - TypeScript 5.8.3 + React 19.1.0, React Router DOM 7.13, MUI 7.3.9, @microsoft/signalr 10.0.0 (009-usecallback-revealed-state)
 - N/A — all state is in-memory React state; no server-side persistence of reveal state (009-usecallback-revealed-state)
-- C# (.NET 10.0) / TypeScript 5.8.3 + ASP.NET Core 10.0, React 19.1.0, Material-UI 7.3.9, @microsoft/signalr 10.0.0, Vite 6.3.5 (009-question-title-universal-hint)
-- JSON files in `src/QuizAppka/Data/categories/` (no database) (009-question-title-universal-hint)
+- C# (.NET 10), TypeScript 5.8.3, React 19.1.0 (010-timed-open-question)
+- JSON category files for static question definitions; in-memory singleton presenter session store for live state (including reveal/timer state) (010-timed-open-question)
+- JSON category files for question configuration; in-memory presenter session store for live mirrored state (010-timed-open-question)
 
 - .NET 10 (C# 13), TypeScript 5.x + ASP.NET Core 10, Microsoft.AspNetCore.SpaProxy, React 18+, Material UI v6+, Vite 5+, .NET Aspire (001-quiz-display-webapp)
 
@@ -37,9 +38,13 @@ npm test; npm run lint
 .NET 10 (C# 13), TypeScript 5.x: Follow standard conventions
 
 ## Recent Changes
-- 009-question-title-universal-hint: Added C# (.NET 10.0) / TypeScript 5.8.3 + ASP.NET Core 10.0, React 19.1.0, Material-UI 7.3.9, @microsoft/signalr 10.0.0, Vite 6.3.5
+
+- 010-timed-open-question: Added C# (.NET 10), TypeScript 5.8.3, React 19.1.0
+- 010-timed-open-question: Added C# (.NET 10), TypeScript 5.8.3, React 19.1.0
 - 009-usecallback-revealed-state: Added TypeScript 5.8.3 + React 19.1.0, React Router DOM 7.13, MUI 7.3.9, @microsoft/signalr 10.0.0
+- 009-question-title-universal-hint: Added C# (.NET 10.0) / TypeScript 5.8.3 + ASP.NET Core 10.0, React 19.1.0, Material-UI 7.3.9, @microsoft/signalr 10.0.0, Vite 6.3.5
 - 007-quiz-layout-improvements: Added TypeScript 5.8 / React 19.1 + MUI v7.3.9 (`@mui/material`), React Router DOM v7, Vite 6, Vitest 4
+
 
 
 <!-- MANUAL ADDITIONS START -->

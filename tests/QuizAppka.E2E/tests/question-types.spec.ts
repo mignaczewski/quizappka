@@ -13,8 +13,9 @@ async function openMirror(presenterPage: Page): Promise<Page> {
   return mirrorPage;
 }
 
+const TIMED_OPEN_ROUTE = '/quiz/sample-category/q6';
+
 test.describe('Question Types — US2: Meme question image reveal', () => {
-  test.describe.configure({ mode: 'serial' });
   test('presenter sees reveal button; clicking it reveals the image', async ({ page }) => {
     await page.goto('/quiz/sample-category/q4');
     await expect(page.getByText('Which meme best describes Monday mornings?')).toBeVisible({ timeout: 10000 });
@@ -85,8 +86,6 @@ test.describe('Question Types — US2: Meme question image reveal', () => {
 });
 
 test.describe('Question Types — US3: Singing Pianos box reveal', () => {
-  test.describe.configure({ mode: 'serial' });
-
   test('boxes start hidden and reveal on click', async ({ page }) => {
     await page.goto('/quiz/sample-category/q5');
     await expect(page.getByText('Press each box to reveal the hidden notes!')).toBeVisible({ timeout: 10000 });
@@ -163,6 +162,93 @@ test.describe('Question Types — US3: Singing Pianos box reveal', () => {
     await expect(mirror.getByTestId('piano-box-2')).toHaveText('𝄞');
     await expect(mirror.getByTestId('piano-box-3')).toHaveText('FA', { timeout: 5000 });
     await expect(mirror.getByTestId('piano-box-4')).toHaveText('𝄞');
+
+    await mirror.close();
+  });
+});
+
+test.describe('Question Types — Timed Open fixture', () => {
+  test('presenter pause-resume-reset flow is synchronized to mirror', async ({ page }) => {
+    await page.goto(TIMED_OPEN_ROUTE);
+    await expect(page.getByTestId('timed-open-timer')).toHaveText('01:00', { timeout: 10000 });
+    await expect(page.getByTestId('timed-open-status')).toHaveText('idle');
+
+    const mirror = await openMirror(page);
+    await expect(mirror.getByTestId('timed-open-timer')).toHaveText('01:00', { timeout: 10000 });
+    await expect(mirror.getByTestId('timed-open-status')).toHaveText('idle');
+
+    await page.getByTestId('timed-open-start').click();
+    await expect(page.getByTestId('timed-open-status')).toHaveText('running', { timeout: 5000 });
+    await expect(mirror.getByTestId('timed-open-status')).toHaveText('running', { timeout: 5000 });
+
+    await page.getByTestId('timed-open-pause').click();
+    await expect(page.getByTestId('timed-open-status')).toHaveText('paused', { timeout: 5000 });
+    await expect(mirror.getByTestId('timed-open-status')).toHaveText('paused', { timeout: 5000 });
+
+    const pausedValue = await mirror.getByTestId('timed-open-timer').innerText();
+    await mirror.waitForTimeout(1200);
+    await expect(mirror.getByTestId('timed-open-timer')).toHaveText(pausedValue);
+
+    await page.getByTestId('timed-open-start').click();
+    await expect(page.getByTestId('timed-open-status')).toHaveText('running', { timeout: 5000 });
+    await expect(mirror.getByTestId('timed-open-status')).toHaveText('running', { timeout: 5000 });
+
+    await page.getByTestId('timed-open-reset').click();
+    await expect(page.getByTestId('timed-open-status')).toHaveText('idle', { timeout: 5000 });
+    await expect(page.getByTestId('timed-open-timer')).toHaveText('01:00');
+    await expect(mirror.getByTestId('timed-open-status')).toHaveText('idle', { timeout: 5000 });
+    await expect(mirror.getByTestId('timed-open-timer')).toHaveText('01:00');
+
+    await mirror.close();
+  });
+
+  test('mirror sync for pause-resume-reset transitions occurs within one second', async ({ page }) => {
+    await page.goto(TIMED_OPEN_ROUTE);
+
+    const mirror = await openMirror(page);
+    await expect(mirror.getByTestId('timed-open-status')).toHaveText('idle', { timeout: 10000 });
+
+    await page.getByTestId('timed-open-start').click();
+    await expect(mirror.getByTestId('timed-open-status')).toHaveText('running', { timeout: 5000 });
+
+    const pauseStart = Date.now();
+    await page.getByTestId('timed-open-pause').click();
+    await expect(mirror.getByTestId('timed-open-status')).toHaveText('paused', { timeout: 5000 });
+    expect(Date.now() - pauseStart).toBeLessThanOrEqual(1000);
+
+    const resumeStart = Date.now();
+    await page.getByTestId('timed-open-start').click();
+    await expect(mirror.getByTestId('timed-open-status')).toHaveText('running', { timeout: 5000 });
+    expect(Date.now() - resumeStart).toBeLessThanOrEqual(1000);
+
+    const resetStart = Date.now();
+    await page.getByTestId('timed-open-reset').click();
+    await expect(mirror.getByTestId('timed-open-status')).toHaveText('idle', { timeout: 5000 });
+    expect(Date.now() - resetStart).toBeLessThanOrEqual(1000);
+
+    await mirror.close();
+  });
+});
+
+test.describe('Question Types — US3: Non-timed open regression', () => {
+  test('open question keeps timer UI hidden in presenter and mirror', async ({ page }) => {
+    await page.goto('/quiz/sample-category/q1');
+    await expect(page.getByText('What is the capital of France?')).toBeVisible({ timeout: 10000 });
+
+    await expect(page.getByTestId('timed-open-timer')).not.toBeVisible();
+    await expect(page.getByTestId('timed-open-status')).not.toBeVisible();
+    await expect(page.getByTestId('timed-open-start')).not.toBeVisible();
+    await expect(page.getByTestId('timed-open-pause')).not.toBeVisible();
+    await expect(page.getByTestId('timed-open-reset')).not.toBeVisible();
+
+    const mirror = await openMirror(page);
+    await expect(mirror.getByText('What is the capital of France?')).toBeVisible({ timeout: 10000 });
+
+    await expect(mirror.getByTestId('timed-open-timer')).not.toBeVisible();
+    await expect(mirror.getByTestId('timed-open-status')).not.toBeVisible();
+    await expect(mirror.getByTestId('timed-open-start')).not.toBeVisible();
+    await expect(mirror.getByTestId('timed-open-pause')).not.toBeVisible();
+    await expect(mirror.getByTestId('timed-open-reset')).not.toBeVisible();
 
     await mirror.close();
   });

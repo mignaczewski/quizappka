@@ -29,6 +29,7 @@ const mockCategory: CategoryDetail = {
       ],
     },
     { id: 'q3', type: 'image-rebus', prompt: 'Name this element', imageRef: 'carbon.png' },
+    { id: 'q4', type: 'timed-open', prompt: 'Name three planets.', initialDurationSeconds: 60 },
   ],
 };
 
@@ -76,6 +77,76 @@ describe('QuestionDetailPage', () => {
     renderPage('science', 'q3');
     await waitFor(() => expect(screen.getByRole('img')).toBeInTheDocument());
     expect(screen.getByText('Name this element')).toBeInTheDocument();
+  });
+
+  it('renders timed-open question with initial timer and start action', async () => {
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
+    renderPage('science', 'q4');
+
+    await waitFor(() => expect(screen.getByText('Name three planets.')).toBeInTheDocument());
+    expect(screen.getByTestId('timed-open-timer')).toHaveTextContent('01:00');
+    expect(screen.getByTestId('timed-open-start')).toBeInTheDocument();
+  });
+
+  it('invokes UpdateState with running timerState after start click', async () => {
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
+    renderPage('science', 'q4');
+
+    await waitFor(() => expect(screen.getByTestId('timed-open-start')).toBeInTheDocument());
+    await userEvent.click(screen.getByTestId('timed-open-start'));
+
+    await waitFor(() => expect(mockInvoke).toHaveBeenCalled());
+    const [method, payload] = mockInvoke.mock.calls[0];
+    expect(method).toBe('UpdateState');
+    expect(payload.revealState.timerState.status).toBe('running');
+    expect(payload.revealState.timerState.initialDurationSeconds).toBe(60);
+    expect(payload.revealState.timerState.remainingSeconds).toBe(60);
+  });
+
+  it('pauses running timer and emits paused timerState', async () => {
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
+    renderPage('science', 'q4');
+
+    await waitFor(() => expect(screen.getByTestId('timed-open-start')).toBeInTheDocument());
+    await userEvent.click(screen.getByTestId('timed-open-start'));
+    await userEvent.click(screen.getByTestId('timed-open-pause'));
+
+    await waitFor(() => expect(mockInvoke).toHaveBeenCalledTimes(2));
+    const pausedCall = mockInvoke.mock.calls[1];
+    expect(pausedCall[0]).toBe('UpdateState');
+    expect(pausedCall[1].revealState.timerState.status).toBe('paused');
+    expect(screen.getByTestId('timed-open-start')).toHaveTextContent('Resume');
+  });
+
+  it('resumes paused timer from current value', async () => {
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
+    renderPage('science', 'q4');
+
+    await waitFor(() => expect(screen.getByTestId('timed-open-start')).toBeInTheDocument());
+    await userEvent.click(screen.getByTestId('timed-open-start'));
+    await userEvent.click(screen.getByTestId('timed-open-pause'));
+    await userEvent.click(screen.getByTestId('timed-open-start'));
+
+    await waitFor(() => expect(mockInvoke).toHaveBeenCalledTimes(3));
+    const resumedCall = mockInvoke.mock.calls[2];
+    expect(resumedCall[1].revealState.timerState.status).toBe('running');
+    expect(resumedCall[1].revealState.timerState.remainingSeconds).toBeLessThanOrEqual(60);
+  });
+
+  it('resets timer to idle state with initial duration', async () => {
+    vi.mocked(quizApi.fetchPresenterCategory).mockResolvedValue(mockCategory);
+    renderPage('science', 'q4');
+
+    await waitFor(() => expect(screen.getByTestId('timed-open-start')).toBeInTheDocument());
+    await userEvent.click(screen.getByTestId('timed-open-start'));
+    await userEvent.click(screen.getByTestId('timed-open-reset'));
+
+    await waitFor(() => expect(mockInvoke).toHaveBeenCalledTimes(2));
+    const resetCall = mockInvoke.mock.calls[1];
+    expect(resetCall[1].revealState.timerState.status).toBe('idle');
+    expect(resetCall[1].revealState.timerState.remainingSeconds).toBe(60);
+    expect(screen.getByTestId('timed-open-timer')).toHaveTextContent('01:00');
+    expect(screen.getByTestId('timed-open-status')).toHaveTextContent('idle');
   });
 
   it('shows error alert when fetch fails', async () => {
@@ -177,7 +248,7 @@ describe('QuestionDetailPage', () => {
       await userEvent.click(screen.getByTestId('piano-box-1'));
 
       expect(screen.getByTestId('piano-box-1')).toHaveTextContent('RE');
-      expect(screen.getByTestId('piano-box-0')).toHaveTextContent('?');
+      expect(screen.getByTestId('piano-box-0')).toHaveTextContent('𝄞');
     });
 
     it('clicking an already-revealed box does not change state', async () => {
@@ -221,7 +292,7 @@ describe('QuestionDetailPage', () => {
       await userEvent.click(screen.getByTestId('piano-box-2'));
 
       expect(screen.getByTestId('piano-box-0')).toHaveTextContent('DO');
-      expect(screen.getByTestId('piano-box-1')).toHaveTextContent('?');
+      expect(screen.getByTestId('piano-box-1')).toHaveTextContent('𝄞');
       expect(screen.getByTestId('piano-box-2')).toHaveTextContent('MI');
     });
   });
