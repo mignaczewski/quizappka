@@ -68,6 +68,8 @@ public class QuizController : ControllerBase
             => new MemeQuestion { Id = meme.Id, Prompt = meme.Prompt, Title = meme.Title, EntryImage = meme.EntryImage, RevealImage = meme.RevealImage, Options = meme.Options },
         SingingPianosQuestion piano when piano.PresenterHint is not null
             => new SingingPianosQuestion { Id = piano.Id, Prompt = piano.Prompt, Title = piano.Title, Boxes = piano.Boxes },
+        ImageRebusQuestion imageRebus when imageRebus.PresenterHint is not null
+            => new ImageRebusQuestion { Id = imageRebus.Id, Prompt = imageRebus.Prompt, Title = imageRebus.Title, ImageRef = imageRebus.ImageRef, PresenterHint = imageRebus.PresenterHint },
         _ => question,
     };
 }

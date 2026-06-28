@@ -1,10 +1,14 @@
 import { useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Link, Typography } from '@mui/material';
 import type { ImageRebusQuestion as ImageRebusQuestionType, DisplayMode } from '../types/quiz';
 
 interface Props {
   question: ImageRebusQuestionType;
   displayMode?: DisplayMode;
+}
+
+function isUrl(value: string): boolean {
+  return value.startsWith('https://') || value.startsWith('http://');
 }
 
 export default function ImageRebusQuestion({ question, displayMode }: Props) {
@@ -53,6 +57,18 @@ export default function ImageRebusQuestion({ question, displayMode }: Props) {
           />
         )}
       </Box>
+
+      {!isMirror && question.presenterHint && (
+        <Typography variant="body2" color="text.secondary" data-testid="presenter-hint" sx={{ mt: 1 }}>
+          {isUrl(question.presenterHint) ? (
+            <Link href={question.presenterHint} target="_blank" rel="noopener noreferrer">
+              {question.presenterHint}
+            </Link>
+          ) : (
+            question.presenterHint
+          )}
+        </Typography>
+      )}
       
     </Box>
   );

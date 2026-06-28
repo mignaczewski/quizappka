@@ -1,5 +1,16 @@
-import { Box, Button, Stack, Typography } from '@mui/material';
-import type { DisplayMode, QuestionTimerState, TimedOpenQuestion as TimedOpenQuestionType } from '../types/quiz';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Stack,
+  Typography,
+} from "@mui/material";
+import type {
+  DisplayMode,
+  QuestionTimerState,
+  TimedOpenQuestion as TimedOpenQuestionType,
+} from "../types/quiz";
+import { useEffect } from "react";
 
 interface Props {
   question: TimedOpenQuestionType;
@@ -14,8 +25,8 @@ function formatSeconds(totalSeconds: number): string {
   const safeSeconds = Math.max(0, totalSeconds);
   const minutes = Math.floor(safeSeconds / 60)
     .toString()
-    .padStart(2, '0');
-  const seconds = (safeSeconds % 60).toString().padStart(2, '0');
+    .padStart(2, "0");
+  const seconds = (safeSeconds % 60).toString().padStart(2, "0");
   return `${minutes}:${seconds}`;
 }
 
@@ -27,26 +38,40 @@ export default function TimedOpenQuestion({
   onPauseTimer,
   onResetTimer,
 }: Props) {
-  const isMirror = displayMode === 'mirror';
-  const status = timerState?.status ?? 'idle';
-  const effectiveRemaining = timerState?.remainingSeconds ?? question.initialDurationSeconds;
+  const isMirror = displayMode === "mirror";
+  const status = timerState?.status ?? "idle";
+  const effectiveRemaining =
+    timerState?.remainingSeconds ?? question.initialDurationSeconds;
   const timerLabel = formatSeconds(effectiveRemaining);
-  const isRunning = status === 'running';
-  const isEnded = status === 'ended';
-  const isPaused = status === 'paused';
-  const isIdleAndInitial = status === 'idle' && effectiveRemaining === question.initialDurationSeconds;
+  const isRunning = status === "running";
+  const isEnded = status === "ended";
+  const isPaused = status === "paused";
+  const isIdleAndInitial =
+    status === "idle" && effectiveRemaining === question.initialDurationSeconds;
+
+  useEffect(() => {
+    console.log((question.initialDurationSeconds - effectiveRemaining)/question.initialDurationSeconds * 100);
+  }, [effectiveRemaining, question.initialDurationSeconds]);
 
   return (
     <>
-      <Typography variant={isMirror ? 'h2' : 'h4'}>{question.prompt}</Typography>
-      <Box sx={{ mt: 2 }}>
-        <Typography variant={isMirror ? 'h2' : 'h4'} data-testid="timed-open-timer" aria-live="polite">
+      <Typography variant={isMirror ? "h2" : "h4"}>
+        {question.prompt}
+      </Typography>
+      <Stack direction="row" sx={{mt: 3}}>
+        <Typography
+          variant={isMirror ? "h2" : "h4"}
+          data-testid="timed-open-timer"
+          aria-live="polite"
+        >
           {timerLabel}
         </Typography>
-        <Typography variant={isMirror ? 'h5' : 'body1'} data-testid="timed-open-status" sx={{ mt: 1 }}>
-          {status}
-        </Typography>
-      </Box>
+        <CircularProgress
+          variant="determinate"
+          value={(question.initialDurationSeconds - effectiveRemaining)/question.initialDurationSeconds * 100}
+          aria-label="Loading"
+        />
+      </Stack>
       {!isMirror && (
         <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
           <Button
@@ -55,7 +80,7 @@ export default function TimedOpenQuestion({
             disabled={isRunning || isEnded}
             data-testid="timed-open-start"
           >
-            {isPaused ? 'Resume' : 'Start'}
+            {isPaused ? "Resume" : "Start"}
           </Button>
           <Button
             variant="outlined"
@@ -63,7 +88,7 @@ export default function TimedOpenQuestion({
             disabled={!isRunning}
             data-testid="timed-open-pause"
           >
-            Pause
+            pauza
           </Button>
           <Button
             variant="text"
@@ -71,7 +96,7 @@ export default function TimedOpenQuestion({
             disabled={isIdleAndInitial}
             data-testid="timed-open-reset"
           >
-            Reset
+            reset
           </Button>
         </Stack>
       )}

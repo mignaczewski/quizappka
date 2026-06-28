@@ -29,6 +29,7 @@ export interface ClosedQuestion extends BaseQuestion {
 export interface ImageRebusQuestion extends BaseQuestion {
   type: 'image-rebus';
   imageRef: string;
+  presenterHint?: string;
 }
 
 export interface MemeQuestion extends BaseQuestion {
